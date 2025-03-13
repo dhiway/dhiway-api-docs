@@ -30,7 +30,4 @@ This repository contains API documentation for Dhiway.
 3. Make your changes and commit them.
 4. Push the changes and create a pull request.
 
-## 📜 License
-
-This project is licensed under the [MIT License](LICENSE).
 
