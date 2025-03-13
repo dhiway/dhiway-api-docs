@@ -1,0 +1,1667 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.4.1",
+        "title": "Wallet",
+        "description": "cloud wallet (API only)",
+        "termsOfService": "http://studio.dhiway.com/page/terms-and-conditions",
+        "contact": {
+            "name": "Dhiway Networks",
+            "email": "info@dhiway.com",
+            "url": "https://dhiway.com"
+        },
+        "license": {
+            "name": "Private",
+            "url": ""
+        }
+    },
+    "servers": [
+        {
+            "url": "https://wallet-api.demo.dhiway.net",
+            "description": "Wallet API - Dhiway Demo Environment"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            },
+            "customBearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "description": "Custom Bearer token for discovery endpoints"
+            }
+        },
+        "responses": {
+            "BadRequest": {
+                "description": "Bad Request - Invalid input data",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "Invalid request payload",
+                            "message": "The provided data is malformed or missing required fields."
+                        }
+                    }
+                }
+            },
+            "Unauthorized": {
+                "description": "Unauthorized - Authentication required or invalid token",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "Unauthorized",
+                            "message": "Authentication token is missing or invalid."
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "description": "Forbidden - Insufficient permissions",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "Forbidden",
+                            "message": "You do not have permission to access this resource."
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "Not Found - Resource not found",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "Not Found",
+                            "message": "The requested resource could not be found."
+                        }
+                    }
+                }
+            },
+            "ServerError": {
+                "description": "Internal Server Error - Something went wrong on the server",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "Internal Server Error",
+                            "message": "An unexpected error occurred. Please try again later."
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "DiscoverIntent": {
+                "type": "object",
+                "properties": {
+                    "did": { "type": "string" },
+                    "orgName": { "type": "string" },
+                    "details": { "type": "object" },
+                    "logo": { "type": "string" },
+                    "registryName": { "type": "string" },
+                    "registryId": { "type": "string" },
+                    "properties": { "type": "object" },
+                    "schemaId": { "type": "string" },
+                    "discoverable": { "type": "boolean" },
+                    "templateId": { "type": "string" },
+                    "pricingDetails": { "type": "object" }
+                }
+            },
+            "UpdateRegistryIntent": {
+                "type": "object",
+                "properties": {
+                    "registryId": { "type": "string" },
+                    "registryName": { "type": "string" },
+                    "discoverable": { "type": "boolean" }
+                },
+                "required": ["registryId"]
+            },
+            "UpdateOrgIntent": {
+                "type": "object",
+                "properties": {
+                    "orgName": { "type": "string" },
+                    "logo": { "type": "string" },
+                    "details": { "type": "object" }
+                }
+            },
+            "Registry": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "orgId": { "type": "string" },
+                    "registryName": { "type": "string" },
+                    "registryId": { "type": "string" },
+                    "properties": { "type": "object" },
+                    "schemaId": { "type": "string" },
+                    "discoverable": { "type": "boolean" },
+                    "orgName": { "type": "string" },
+                    "logo": { "type": "string" },
+                    "templateId": { "type": "string" },
+                    "pricingDetails": { "type": "object" },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                }
+            },
+            "Discover": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "did": { "type": "string" },
+                    "orgId": { "type": "string" },
+                    "orgName": { "type": "string" },
+                    "logo": { "type": "string" },
+                    "registryCount": { "type": "integer" },
+                    "active": { "type": "boolean" },
+                    "details": { "type": "object" },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                }
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "The unique identifier of the user"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the user"
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "The email address of the user"
+                    },
+                    "did": {
+                        "type": "string",
+                        "description": "The Decentralized Identifier (DID) of the user"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "description": "Indicates whether the user is active"
+                    }
+                }
+            },
+            "Message": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "The unique identifier of the message"
+                    },
+                    "fromDid": {
+                        "type": "string",
+                        "description": "The DID of the sender"
+                    },
+                    "did": {
+                        "type": "string",
+                        "description": "The DID of the recipient"
+                    },
+                    "unread": {
+                        "type": "boolean",
+                        "description": "Indicates whether the message is unread"
+                    },
+                    "details": {
+                        "type": "object",
+                        "description": "Additional details of the message, typically document data"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Timestamp when the message was created"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Timestamp when the message was last updated"
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/users/did-check": {
+            "post": {
+                "tags": ["User Management"],
+                "summary": "Check if a DID exists",
+                "description": "This endpoint checks if a given Decentralized Identifier (DID) already exists in the system. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "example": {
+                                    "didName": "john90@cord"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response indicating whether the DID exists",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": false
+                                }
+                            }
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "post": {
+                "tags": ["User Management"],
+                "summary": "Create a new user",
+                "description": "This endpoint creates a new user in the system. It requires a valid Bearer token for authentication and accepts user details such as name, email, and DID name.",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "example": {
+                                    "name": "john",
+                                    "email": "john.doe@example.org",
+                                    "termsAccepted": true,
+                                    "didName": "john90@cord",
+                                    "device": "android"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response indicating the user was created",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/users/{id}": {
+            "get": {
+                "tags": ["User Management"],
+                "summary": "Retrieve a user by ID",
+                "description": "Fetches the user data for the specified ID, filtered by active status. Requires a valid Bearer token for authentication. The 'active' query parameter can be used to filter results, defaulting to true if not provided.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The unique identifier of the user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "required": false,
+                        "description": "Filter by active status. If not provided, defaults to true, returning only active users.",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with the user data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - User not found or invalid ID",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "error": "Invalid User ID"
+                                }
+                            }
+                        }
+                    },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "403": { "$ref": "#/components/responses/Forbidden" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/otp-email-verify": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Verify email OTP",
+                "description": "This endpoint verifies the One-Time Password (OTP) sent to the user's email for authentication purposes. It requires a valid Bearer token and the session ID along with the OTP.",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "example": {
+                                    "id": "nf18d940f-0832-4b15-b572-bfda38be55ea",
+                                    "otp": 903115
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response indicating OTP verification succeeded",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "404": { "$ref": "#/components/responses/NotFound" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/otp/login": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Request OTP for login",
+                "description": "This endpoint requests a One-Time Password (OTP) to be sent to the user's email for login purposes. It requires a valid Bearer token and the user's email and device information.",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "example": {
+                                    "email": "john.doe@example.org",
+                                    "device": "android"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response indicating OTP request was sent",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "404": { "$ref": "#/components/responses/NotFound" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/otp/login-verify": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Verify OTP for login",
+                "description": "This endpoint verifies the One-Time Password (OTP) provided by the user for login. It requires a valid Bearer token, session ID, and the OTP.",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "example": {
+                                    "id": "n366a2842-96ea-460d-8f70-67c6a5191b0d",
+                                    "otp": 674618
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response indicating login OTP verification succeeded",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "404": { "$ref": "#/components/responses/NotFound" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/otp/resendOtp": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Resend OTP to user's email",
+                "description": "Resends a new OTP to the email associated with the provided session ID. This endpoint is used when the user needs a new OTP, for example, if the previous one expired or was not received. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "description": "The session ID used to identify the user session",
+                                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                                    }
+                                },
+                                "required": ["id"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP successfully resent to the user's email",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "string",
+                                            "enum": ["SUCCESS"],
+                                            "description": "Indicates the OTP was successfully resent",
+                                            "example": "SUCCESS"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Session not found or invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "string",
+                                            "enum": ["Session not found"],
+                                            "description": "Indicates the session ID was not found",
+                                            "example": "Session not found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "A generic error message",
+                                            "example": "Internal Server Error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "get": {
+                "tags": ["Authentication"],
+                "summary": "Logout the user",
+                "description": "Logs out the current user by invalidating the session. Note: This endpoint is currently not implemented and returns a placeholder response. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Successful response (placeholder) indicating the function is not implemented",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "error": "function not implemented"
+                                }
+                            }
+                        }
+                    },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/auth/submit": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Submit verifiable presentation",
+                "description": "Submits a verifiable presentation for authentication or verification purposes. It requires a valid Bearer token and a message containing presentation details.",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "description": "Presentation details",
+                                        "example": "cord://<json-data>"
+                                    }
+                                },
+                                "required": ["message"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful submission of the verifiable presentation",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "success": true,
+                                    "message": "response submitted"
+                                }
+                            }
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "403": { "$ref": "#/components/responses/Forbidden" },
+                    "404": { "$ref": "#/components/responses/NotFound" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/auth/login": {
+            "get": {
+                "tags": ["Authentication"],
+                "summary": "Check if user is logged in",
+                "description": "Verifies if the user is logged in based on the session token. It requires a valid Bearer token for authentication and returns a success flag.",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "User is logged in",
+                        "content": {
+                            "application/json": {
+                                "example": { "success": true }
+                            }
+                        }
+                    },
+                    "403": { "$ref": "#/components/responses/Forbidden" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/auth/getVcQr": {
+            "get": {
+                "tags": ["Authentication"],
+                "summary": "Get QR code for verifiable credential",
+                "description": "Generates a QR code for verifiable credential processes. It requires a valid Bearer token and optionally accepts a credential type parameter.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Type of the credential",
+                        "required": false,
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "QR code generated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "vc": {
+                                            "type": "object",
+                                            "properties": {
+                                                "challenge": {
+                                                    "type": "string"
+                                                },
+                                                "type": { "type": "string" }
+                                            }
+                                        },
+                                        "qrStr": { "type": "string" },
+                                        "qr": { "type": "string" }
+                                    }
+                                },
+                                "example": {
+                                    "vc": {
+                                        "challenge": "session-id",
+                                        "type": "vc"
+                                    },
+                                    "qrStr": "{\"challenge\":\"session-id\",\"type\":\"vc\"}",
+                                    "qr": "https://hashcodedemo.dhiway.com/?text=cord://<qrStr>"
+                                }
+                            }
+                        }
+                    },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/auth/fetchVerifyVC": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Fetch and verify verifiable credential",
+                "description": "Fetches and verifies a verifiable credential. It requires a valid Bearer token and a message containing the holder's DID, challenge, and other details.",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "object",
+                                        "properties": {
+                                            "holderDid": { "type": "string" },
+                                            "challenge": { "type": "string" },
+                                            "id": { "type": "string" },
+                                            "fields": {
+                                                "type": "array",
+                                                "items": { "type": "string" }
+                                            }
+                                        },
+                                        "required": [
+                                            "holderDid",
+                                            "challenge",
+                                            "id"
+                                        ]
+                                    }
+                                },
+                                "required": ["message"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful verification of the verifiable credential",
+                        "content": {
+                            "application/json": {
+                                "example": { "success": true }
+                            }
+                        }
+                    },
+                    "403": { "$ref": "#/components/responses/Forbidden" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/auth/checkVC": {
+            "get": {
+                "tags": ["Authentication"],
+                "summary": "Check verifiable credential status",
+                "description": "Checks the status of a verifiable credential using a challenge parameter. This endpoint does not require authentication but needs a valid challenge query parameter.",
+                "parameters": [
+                    {
+                        "name": "challenge",
+                        "in": "query",
+                        "required": true,
+                        "description": "Challenge associated with the credential",
+                        "schema": { "type": "string" }
+                    },
+                    {
+                        "name": "verify",
+                        "in": "query",
+                        "required": false,
+                        "description": "Flag to indicate verification",
+                        "schema": { "type": "boolean" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Credential status returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "need_return": {
+                                                    "type": "boolean"
+                                                },
+                                                "login": { "type": "boolean" },
+                                                "session": { "type": "object" }
+                                            }
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": { "type": "string" }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "verified": {
+                                        "value": {
+                                            "need_return": true,
+                                            "login": true,
+                                            "session": {}
+                                        }
+                                    },
+                                    "notVerified": {
+                                        "value": {
+                                            "message": "Please Scan the qr code"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/auth/issue-verify-vc": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Issue and verify a Verifiable Credential",
+                "description": "Issues and verifies a Verifiable Credential. It requires a valid Bearer token and a message containing the challenge and holder DID.",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "example": {
+                                    "message": "{\n    \"challenge\": \"3NQBytgSkkuERrNjJBO6kVoNCf_MzWZ8\",\n    \"holderDid\": \"did:cord:3weRJPrLvELBdGUF1mLwueqJu4WcFv16SwBPFPQK4EJoNEnL\"\n  }"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful issuance and verification of the credential",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "403": { "$ref": "#/components/responses/Forbidden" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/cred": {
+            "get": {
+                "tags": ["Credential Management"],
+                "summary": "Retrieve user credentials",
+                "description": "Fetches the credentials associated with the authenticated user's DID. Requires a valid Bearer token or a custom Bearer token in the Authorization header.",
+                "security": [{ "customBearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with the user's credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "active": { "type": "boolean" },
+                                            "identifier": {
+                                                "type": "string",
+                                                "format": "uuid"
+                                            },
+                                            "hash": {
+                                                "type": "string",
+                                                "nullable": true
+                                            },
+                                            "did": { "type": "string" },
+                                            "credential": {
+                                                "type": "string",
+                                                "nullable": true
+                                            },
+                                            "credentialVC": {
+                                                "type": "string"
+                                            },
+                                            "details": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "meta": {
+                                                        "type": "string"
+                                                    },
+                                                    "documentTitle": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "createdAt": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updatedAt": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": [
+                                    {
+                                        "id": "cc3e69610-725c-4ec5-b504-028f291263df",
+                                        "active": true,
+                                        "identifier": "08cc0ac3-bb7f-4a43-8d4b-5c193bd50dd4",
+                                        "hash": null,
+                                        "did": "did:cord:3vmBorPixWDF6DAsw6FYyzBXkBzjvT36BTQj6ZhgKd6yD5Ch",
+                                        "credential": null,
+                                        "credentialVC": "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://cord.network/2023/cred/v1\"],\"type\":[\"VerifiableCredential\"],\"issuer\":\"did:cord:3z2jGMtb91fq7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX\",\"issuanceDate\":\"2025-03-11T06:21:36.289Z\",\"credentialSubject\":{\"email\":\"john.doe@example.org\",\"name\":\"john\",\"id\":\"did:cord:3z2jGMtb91fA7QUXz518aq9q2MwRpU9cz5i4rpcQbLLkBhDX\",\"@context\":{\"vocab\":\"schema:cord:s317LR3icBPmbW3ZAWkLj1Nq7WdUA4WfVXa8mWpCmAm6yEi5R#\"}},\"validFrom\":\"2025-03-11T06:21:36.289Z\",\"validUntil\":\"2026-03-11T06:21:36.289Z\",\"metadata\":{},\"credentialSchema\":{\"$id\":\"schema:cord:s317LR3icBPmbW3ZAWkLj1Nq7WdUA4WfVXa8mWpCmAm6yEi5R\",\"title\":\"wallet-otp-schema\",\"properties\":{\"name\":{\"type\":\"string\"},\"email\":{\"type\":\"string\"}},\"required\":[],\"type\":\"object\",\"additionalProperties\":false,\"$schema\":\"http://cord.network/draft-01/schema#\"}}",
+                                        "details": {
+                                            "meta": "endpoint-received",
+                                            "documentTitle": "otp"
+                                        },
+                                        "createdAt": "2025-03-11T06:21:39.221Z",
+                                        "updatedAt": "2025-03-11T06:21:39.221Z"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Invalid or missing Bearer token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": { "type": "string" }
+                                    }
+                                },
+                                "example": { "error": "Forbidden" }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": { "type": "string" }
+                                    }
+                                },
+                                "example": { "error": "Internal Server Error" }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/discover/digilocker-request": {
+            "get": {
+                "tags": ["DigiLocker"],
+                "summary": "Initiate DigiLocker request",
+                "description": "Initiates a request to DigiLocker for authentication or data retrieval. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Successful response indicating DigiLocker request initiation",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/discover/digilocker-auth": {
+            "get": {
+                "tags": ["DigiLocker"],
+                "summary": "Authenticate with DigiLocker",
+                "description": "Authenticates the user with DigiLocker. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Successful response indicating DigiLocker authentication succeeded",
+                        "content": {
+                            "application/json": {}
+                        }
+                    },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/request/fetch-discover/{orgId}": {
+            "get": {
+                "tags": ["Discovery"],
+                "summary": "Fetch discovery data by org ID",
+                "description": "Fetches discovery data for a specific organization identified by its unique ID. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "orgId",
+                        "in": "path",
+                        "required": true,
+                        "description": "The unique organization ID prefixed with 'o'",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with discovery data for the specified organization",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "result": "success",
+                                    "discover": [
+                                        {
+                                            "id": "o02151c3a-5d3c-4a4c-8043-4038484ae5ad",
+                                            "did": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX",
+                                            "orgId": "d8763421-a34b-4c5d-9c4e-9cbd7a923654",
+                                            "orgName": "Dhiway",
+                                            "logo": "https://example.com/uploads/logo/dhiway-logo.png",
+                                            "registryCount": 5,
+                                            "active": true,
+                                            "details": {
+                                                "meta": "Organization Registered",
+                                                "documentTitle": "Dhiway Organization"
+                                            },
+                                            "createdAt": "2025-03-11T06:21:39.221Z",
+                                            "updatedAt": "2025-03-11T06:21:39.221Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "404": { "$ref": "#/components/responses/NotFound" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/request/fetch-discover": {
+            "get": {
+                "tags": ["Discovery"],
+                "summary": "Fetch all discovery data",
+                "description": "Fetches all discovery data for organizations. It requires a valid Bearer token for authentication and returns a list of discoverable organizations.",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with all discoverable organization data",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "result": "success",
+                                    "discover": [
+                                        {
+                                            "id": "o02151c3a-5d3c-4a4c-8043-4038484ae5ad",
+                                            "did": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX",
+                                            "orgId": "d8763421-a34b-4c5d-9c4e-9cbd7a923654",
+                                            "orgName": "Dhiway",
+                                            "logo": "https://example.com/uploads/logo/dhiway-logo.png",
+                                            "registryCount": 5,
+                                            "active": true,
+                                            "details": {
+                                                "meta": "Organization Registered",
+                                                "documentTitle": "Dhiway Organization"
+                                            },
+                                            "createdAt": "2025-03-11T06:21:39.221Z",
+                                            "updatedAt": "2025-03-11T06:21:39.221Z"
+                                        },
+                                        {
+                                            "id": "o08a2c3b-21dd-4b4a-bb9c-62cbd9c87cde",
+                                            "did": "did:cord:3xt5Z5R9UZSaFWDwwzM6SeMjWZMJbivFCLzQLdWXKP9x51Zt",
+                                            "orgId": "b7643212-a98b-4c5d-9b4e-9cbd7a923654",
+                                            "orgName": "Cord Network",
+                                            "logo": "https://example.com/uploads/logo/cord-logo.png",
+                                            "registryCount": 10,
+                                            "active": true,
+                                            "details": {
+                                                "meta": "Organization Registered",
+                                                "documentTitle": "Cord Network"
+                                            },
+                                            "createdAt": "2025-03-11T06:22:39.221Z",
+                                            "updatedAt": "2025-03-11T06:22:39.221Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/request/setDiscover/{orgId}": {
+            "post": {
+                "tags": ["Discovery"],
+                "summary": "Store a new discoverable entry for an organization",
+                "description": "Stores a new discoverable entry for an organization identified by its unique ID. It requires a valid Bearer token and a message containing the discovery intent details.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "orgId",
+                        "in": "path",
+                        "required": true,
+                        "description": "The unique organization ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "object",
+                                        "properties": {
+                                            "intent": {
+                                                "$ref": "#/components/schemas/DiscoverIntent"
+                                            }
+                                        },
+                                        "required": ["intent"]
+                                    }
+                                },
+                                "required": ["message"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successfully created a new discoverable entry",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": { "type": "string" }
+                                    }
+                                },
+                                "example": { "result": "success" }
+                            }
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "404": { "$ref": "#/components/responses/NotFound" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/request/updateDiscover/{orgId}": {
+            "put": {
+                "tags": ["Discovery"],
+                "summary": "Update an existing discoverable registry entry",
+                "description": "Updates an existing discoverable registry entry for an organization identified by its unique ID. It requires a valid Bearer token and a message containing the update intent.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "orgId",
+                        "in": "path",
+                        "required": true,
+                        "description": "The unique organization ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "object",
+                                        "properties": {
+                                            "intent": {
+                                                "$ref": "#/components/schemas/UpdateRegistryIntent"
+                                            }
+                                        },
+                                        "required": ["intent"]
+                                    }
+                                },
+                                "required": ["message"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated the discoverable registry entry",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": { "type": "string" }
+                                    }
+                                },
+                                "example": { "result": "success" }
+                            }
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "404": { "$ref": "#/components/responses/NotFound" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/request/updateDiscoverOrg/{orgId}": {
+            "put": {
+                "tags": ["Discovery"],
+                "summary": "Update the organization's discoverable details",
+                "description": "Updates the organization's discoverable details for an organization identified by its unique ID. It requires a valid Bearer token and a message containing the organization update intent.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "orgId",
+                        "in": "path",
+                        "required": true,
+                        "description": "The unique organization ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "object",
+                                        "properties": {
+                                            "intent": {
+                                                "$ref": "#/components/schemas/UpdateOrgIntent"
+                                            }
+                                        },
+                                        "required": ["intent"]
+                                    }
+                                },
+                                "required": ["message"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated the organization's discoverable details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": { "type": "string" }
+                                    }
+                                },
+                                "example": { "result": "success" }
+                            }
+                        }
+                    },
+                    "400": { "$ref": "#/components/responses/BadRequest" },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "404": { "$ref": "#/components/responses/NotFound" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/message/{did}": {
+            "post": {
+                "tags": ["Message Management"],
+                "summary": "Receive a message for a specific DID",
+                "description": "This endpoint allows sending a message to a specific Decentralized Identifier (DID). The message can be of type 'document' or 'identity', which also triggers the creation of a credential entry internally. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "did",
+                        "in": "path",
+                        "required": true,
+                        "description": "The DID of the recipient",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "description": "The unique identifier of the message"
+                                    },
+                                    "fromDid": {
+                                        "type": "string",
+                                        "description": "The DID of the sender"
+                                    },
+                                    "message": {
+                                        "type": "object",
+                                        "properties": {
+                                            "document": {
+                                                "type": "object",
+                                                "description": "The document details of the message"
+                                            }
+                                        },
+                                        "description": "The message content, typically containing document details"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": ["document", "identity"],
+                                        "description": "The type of the message"
+                                    }
+                                },
+                                "required": ["id", "fromDid", "message", "type"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Message received successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid input data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Invalid request payload"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            },
+            "get": {
+                "tags": ["Message Management"],
+                "summary": "Retrieve all messages for a specific DID",
+                "description": "Fetches all messages for the specified DID. Optionally filters by unread status using the 'unread' query parameter. If unread messages are retrieved, they are marked as read. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "did",
+                        "in": "path",
+                        "required": true,
+                        "description": "The DID of the user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "unread",
+                        "in": "query",
+                        "required": false,
+                        "description": "Filter messages by unread status. '0' returns read messages, any other value (or absence) returns unread messages.",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["0", "1"]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with the list of messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Message"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/message/{did}/{id}": {
+            "get": {
+                "tags": ["Message Management"],
+                "summary": "Retrieve a specific message by ID for a DID",
+                "description": "Fetches a specific message by its ID for the given DID. If the message is unread, it is marked as read upon retrieval. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "did",
+                        "in": "path",
+                        "required": true,
+                        "description": "The DID of the user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with the message data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Message"
+                                }
+                            }
+                        }
+                    },
+                    "401": { "$ref": "#/components/responses/Unauthorized" },
+                    "404": {
+                        "description": "Message not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Message not found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": { "$ref": "#/components/responses/ServerError" }
+                }
+            }
+        },
+        "/api/v1/fields/fieldsFetch": {
+            "get": {
+                "tags": ["Fields Management"],
+                "summary": "Fetch static list of fields",
+                "description": "Returns a predefined list of fields with their corresponding values. It requires a valid Bearer token for authentication and is used to retrieve supported field keys and value types.",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with the list of fields",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "k": {
+                                                "type": "string",
+                                                "description": "The key of the field"
+                                            },
+                                            "v": {
+                                                "type": "array",
+                                                "items": { "type": "string" },
+                                                "description": "The value types associated with the field"
+                                            }
+                                        },
+                                        "required": ["k", "v"]
+                                    }
+                                },
+                                "example": [
+                                    { "k": "name", "v": ["otp"] },
+                                    { "k": "email", "v": ["otp"] }
+                                ]
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Missing or invalid Bearer token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/fields/details/{did}": {
+            "post": {
+                "tags": ["Fields Management"],
+                "summary": "Fetch detailed field information for a DID",
+                "description": "Retrieves detailed information for the specified fields associated with a given DID. The fields to fetch are provided in the request body. It requires a valid Bearer token for authentication.",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "did",
+                        "in": "path",
+                        "required": true,
+                        "description": "The Decentralized Identifier (DID) of the user",
+                        "schema": {
+                            "type": "string",
+                            "example": "did:example:123456789abcdefghi"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "fields": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "k": {
+                                                    "type": "string",
+                                                    "description": "The key of the field"
+                                                },
+                                                "v": {
+                                                    "type": "string",
+                                                    "description": "The value type (e.g., 'otp', 'aadhaar')"
+                                                }
+                                            },
+                                            "required": ["k", "v"]
+                                        },
+                                        "description": "List of fields to fetch details for"
+                                    }
+                                },
+                                "required": ["fields"]
+                            },
+                            "example": {
+                                "fields": [
+                                    { "k": "name", "v": "otp" },
+                                    { "k": "email", "v": "otp" }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response with detailed field information",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "k": {
+                                                        "type": "string",
+                                                        "description": "The key of the field"
+                                                    },
+                                                    "v": {
+                                                        "type": "string",
+                                                        "description": "The value type"
+                                                    },
+                                                    "val": {
+                                                        "type": "string",
+                                                        "description": "The value of the field, if found, otherwise empty"
+                                                    }
+                                                },
+                                                "required": ["k", "v", "val"]
+                                            }
+                                        }
+                                    },
+                                    "required": ["data"]
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "k": "name",
+                                            "v": "otp",
+                                            "val": "John Doe"
+                                        },
+                                        {
+                                            "k": "email",
+                                            "v": "otp",
+                                            "val": "john.doe@example.com"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid input data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Invalid request payload"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Missing or invalid Bearer token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
