@@ -407,6 +407,110 @@
                 }
             }
         },
+        "/api/v1/custom-user/create": {
+            "post": {
+                "tags": ["Custom User"],
+                "summary": "Create a new custom user",
+                "description": "Creates a new custom user with the provided accountId, generates a decentralized identifier (DID), and issues a unique token.",
+                "security": [{ "bearerAuth": [] }],
+                "operationId": "createCustomUser",
+                "requestBody": {
+                    "description": "Account ID of the user to be created",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomUserRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateUserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accountId or user already exists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create user or generate token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/custom-user/regenerate-token": {
+            "post": {
+                "tags": ["Custom User"],
+                "summary": "Regenerate token for an existing user",
+                "description": "Regenerates a new token for an existing user identified by the provided accountId, replacing any existing session token.",
+                "security": [{ "bearerAuth": [] }],
+                "operationId": "regenerateToken",
+                "requestBody": {
+                    "description": "Account ID of the user to regenerate token for",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomUserRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Token regenerated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegenerateTokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accountId or user does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to regenerate token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/otp-email-verify": {
             "post": {
                 "tags": ["Authentication"],
@@ -1217,6 +1321,10 @@
                                             "documentTitle": {
                                                 "type": "string",
                                                 "description": "Title of the document"
+                                            },
+                                            "user": {
+                                                "type": "string",
+                                                "enum": ["custom"]
                                             }
                                         },
                                         "description": "Additional details for the message"
@@ -1600,108 +1708,6 @@
                                             "example": "Internal server error"
                                         }
                                     }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/custom-user/create": {
-            "post": {
-                "tags": ["Custom-user"],
-                "summary": "Create a new custom user",
-                "description": "Creates a new custom user with the provided accountId, generates a decentralized identifier (DID), and issues a unique token.",
-                "operationId": "createCustomUser",
-                "requestBody": {
-                    "description": "Account ID of the user to be created",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CustomUserRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "User created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CreateUserResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid accountId or user already exists",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to create user or generate token",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/custom-user/regenerate-token": {
-            "post": {
-                "tags": ["Custom-user"],
-                "summary": "Regenerate token for an existing user",
-                "description": "Regenerates a new token for an existing user identified by the provided accountId, replacing any existing session token.",
-                "operationId": "regenerateToken",
-                "requestBody": {
-                    "description": "Account ID of the user to regenerate token for",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CustomUserRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "Token regenerated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RegenerateTokenResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid accountId or user does not exist",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to regenerate token",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
