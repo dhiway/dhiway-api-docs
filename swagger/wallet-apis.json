@@ -216,6 +216,70 @@
                         "description": "Timestamp when the message was last updated"
                     }
                 }
+            },
+            "CustomUserRequest": {
+                "type": "object",
+                "properties": {
+                    "accountId": {
+                        "type": "string",
+                        "description": "Unique identifier for the user account"
+                    }
+                },
+                "required": ["accountId"]
+            },
+            "CreateUserResponse": {
+                "type": "object",
+                "properties": {
+                    "activation": {
+                        "type": "string",
+                        "example": "SUCCESS",
+                        "description": "Status of the user creation"
+                    },
+                    "token": {
+                        "type": "string",
+                        "description": "Unique token generated for the user"
+                    }
+                },
+                "required": ["activation", "token"]
+            },
+            "RegenerateTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "activation": {
+                        "type": "string",
+                        "example": "SUCCESS",
+                        "description": "Status of the token regeneration"
+                    },
+                    "userDetails": {
+                        "type": "object",
+                        "properties": {
+                            "accountId": {
+                                "type": "string",
+                                "description": "Account ID of the user"
+                            },
+                            "did": {
+                                "type": "string",
+                                "description": "Decentralized Identifier (DID) of the user"
+                            }
+                        },
+                        "required": ["accountId", "did"]
+                    },
+                    "token": {
+                        "type": "string",
+                        "description": "Newly generated token for the user"
+                    }
+                },
+                "required": ["activation", "userDetails", "token"]
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "description": "Error message describing the issue"
+                    }
+                },
+                "required": ["error"]
             }
         }
     },
@@ -347,7 +411,7 @@
             "post": {
                 "tags": ["Authentication"],
                 "summary": "Verify email OTP",
-                "description": "This endpoint verifies the One-Time Password (OTP) sent to the user's email for authentication purposes. It requires a valid Bearer token and the session ID along with the OTP.",
+                "description": "This endpoint verifies the One-Time Password (OTP) sent to the user's email for authentication purposes. It requires a valid Bearer token and the user ID along with the OTP.",
                 "security": [{ "bearerAuth": [] }],
                 "requestBody": {
                     "content": {
@@ -608,207 +672,6 @@
                 }
             }
         },
-        "/api/v1/auth/getVcQr": {
-            "get": {
-                "tags": ["Authentication"],
-                "summary": "Get QR code for verifiable credential",
-                "description": "Generates a QR code for verifiable credential processes. It requires a valid Bearer token and optionally accepts a credential type parameter.",
-                "security": [{ "bearerAuth": [] }],
-                "parameters": [
-                    {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Type of the credential",
-                        "required": false,
-                        "schema": { "type": "string" }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "QR code generated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "vc": {
-                                            "type": "object",
-                                            "properties": {
-                                                "challenge": {
-                                                    "type": "string"
-                                                },
-                                                "type": { "type": "string" }
-                                            }
-                                        },
-                                        "qrStr": { "type": "string" },
-                                        "qr": { "type": "string" }
-                                    }
-                                },
-                                "example": {
-                                    "vc": {
-                                        "challenge": "session-id",
-                                        "type": "vc"
-                                    },
-                                    "qrStr": "{\"challenge\":\"session-id\",\"type\":\"vc\"}",
-                                    "qr": "https://hashcodedemo.dhiway.com/?text=cord://<qrStr>"
-                                }
-                            }
-                        }
-                    },
-                    "401": { "$ref": "#/components/responses/Unauthorized" },
-                    "500": { "$ref": "#/components/responses/ServerError" }
-                }
-            }
-        },
-        "/api/v1/auth/fetchVerifyVC": {
-            "post": {
-                "tags": ["Authentication"],
-                "summary": "Fetch and verify verifiable credential",
-                "description": "Fetches and verifies a verifiable credential. It requires a valid Bearer token and a message containing the holder's DID, challenge, and other details.",
-                "security": [{ "bearerAuth": [] }],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "object",
-                                        "properties": {
-                                            "holderDid": { "type": "string" },
-                                            "challenge": { "type": "string" },
-                                            "id": { "type": "string" },
-                                            "fields": {
-                                                "type": "array",
-                                                "items": { "type": "string" }
-                                            }
-                                        },
-                                        "required": [
-                                            "holderDid",
-                                            "challenge",
-                                            "id"
-                                        ]
-                                    }
-                                },
-                                "required": ["message"]
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful verification of the verifiable credential",
-                        "content": {
-                            "application/json": {
-                                "example": { "success": true }
-                            }
-                        }
-                    },
-                    "403": { "$ref": "#/components/responses/Forbidden" },
-                    "500": { "$ref": "#/components/responses/ServerError" }
-                }
-            }
-        },
-        "/api/v1/auth/checkVC": {
-            "get": {
-                "tags": ["Authentication"],
-                "summary": "Check verifiable credential status",
-                "description": "Checks the status of a verifiable credential using a challenge parameter. This endpoint does not require authentication but needs a valid challenge query parameter.",
-                "parameters": [
-                    {
-                        "name": "challenge",
-                        "in": "query",
-                        "required": true,
-                        "description": "Challenge associated with the credential",
-                        "schema": { "type": "string" }
-                    },
-                    {
-                        "name": "verify",
-                        "in": "query",
-                        "required": false,
-                        "description": "Flag to indicate verification",
-                        "schema": { "type": "boolean" }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Credential status returned",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "oneOf": [
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "need_return": {
-                                                    "type": "boolean"
-                                                },
-                                                "login": { "type": "boolean" },
-                                                "session": { "type": "object" }
-                                            }
-                                        },
-                                        {
-                                            "type": "object",
-                                            "properties": {
-                                                "message": { "type": "string" }
-                                            }
-                                        }
-                                    ]
-                                },
-                                "examples": {
-                                    "verified": {
-                                        "value": {
-                                            "need_return": true,
-                                            "login": true,
-                                            "session": {}
-                                        }
-                                    },
-                                    "notVerified": {
-                                        "value": {
-                                            "message": "Please Scan the qr code"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "500": { "$ref": "#/components/responses/ServerError" }
-                }
-            }
-        },
-        "/api/v1/auth/issue-verify-vc": {
-            "post": {
-                "tags": ["Authentication"],
-                "summary": "Issue and verify a Verifiable Credential",
-                "description": "Issues and verifies a Verifiable Credential. It requires a valid Bearer token and a message containing the challenge and holder DID.",
-                "security": [{ "bearerAuth": [] }],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "example": {
-                                    "message": "{\n    \"challenge\": \"3NQBytgSkkuERrNjJBO6kVoNCf_MzWZ8\",\n    \"holderDid\": \"did:cord:3weRJPrLvELBdGUF1mLwueqJu4WcFv16SwBPFPQK4EJoNEnL\"\n  }"
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful issuance and verification of the credential",
-                        "content": {
-                            "application/json": {}
-                        }
-                    },
-                    "400": { "$ref": "#/components/responses/BadRequest" },
-                    "401": { "$ref": "#/components/responses/Unauthorized" },
-                    "403": { "$ref": "#/components/responses/Forbidden" },
-                    "500": { "$ref": "#/components/responses/ServerError" }
-                }
-            }
-        },
         "/api/v1/cred": {
             "get": {
                 "tags": ["Credential Management"],
@@ -938,11 +801,61 @@
             }
         },
         "/api/v1/discover/digilocker-auth": {
-            "get": {
+            "post": {
                 "tags": ["DigiLocker"],
                 "summary": "Authenticate with DigiLocker",
                 "description": "Authenticates the user with DigiLocker. It requires a valid Bearer token for authentication.",
                 "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "description": "Unique identifier for the request. Example varies by doctype.",
+                                        "example": "r8f3beded-489e-5dbe-994f-9475ff7cafec"
+                                    },
+                                    "schemaId": {
+                                        "type": "string",
+                                        "description": "Schema identifier for the request. Example varies by doctype.",
+                                        "example": "s2gd1db91-5b3b-5g28-bg7f-793cdf999649"
+                                    },
+                                    "authId": {
+                                        "type": "string",
+                                        "example": "auth:cord:t3hDFfftSoM4F9G9TCW8n4JAdgsEPZiVrNoVhXW2cTa8uW78A",
+                                        "description": "Authentication ID for the request."
+                                    },
+                                    "holderDid": {
+                                        "type": "string",
+                                        "example": "did:cord:xxxxxxxxxxxx",
+                                        "description": "Decentralized Identifier (DID) of the holder."
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "xxxxxxxxxxxxxxxxx",
+                                        "description": "Authorization code for DigiLocker authentication."
+                                    },
+                                    "doctype": {
+                                        "type": "string",
+                                        "enum": ["aadhaar", "pan"],
+                                        "description": "The type of document to authenticate with DigiLocker."
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "schemaId",
+                                    "authId",
+                                    "holderDid",
+                                    "code",
+                                    "doctype"
+                                ]
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Successful response indicating DigiLocker authentication succeeded",
@@ -1061,7 +974,7 @@
                 }
             }
         },
-        "/api/v1/request/setDiscover/{orgId}": {
+        "/api/v1/request/set-discover/{orgId}": {
             "post": {
                 "tags": ["Discovery"],
                 "summary": "Store a new discoverable entry for an organization",
@@ -1122,7 +1035,7 @@
                 }
             }
         },
-        "/api/v1/request/updateDiscover/{orgId}": {
+        "/api/v1/request/update-discover/{orgId}": {
             "put": {
                 "tags": ["Discovery"],
                 "summary": "Update an existing discoverable registry entry",
@@ -1183,7 +1096,7 @@
                 }
             }
         },
-        "/api/v1/request/updateDiscoverOrg/{orgId}": {
+        "/api/v1/request/update-discover-org/{orgId}": {
             "put": {
                 "tags": ["Discovery"],
                 "summary": "Update the organization's discoverable details",
@@ -1244,7 +1157,7 @@
                 }
             }
         },
-        "/api/v1/message/{did}": {
+        "/api/v1/message/create/{did}": {
             "post": {
                 "tags": ["Message Management"],
                 "summary": "Receive a message for a specific DID",
@@ -1255,7 +1168,7 @@
                         "name": "did",
                         "in": "path",
                         "required": true,
-                        "description": "The DID of the recipient",
+                        "description": "The DID of the recipient (Get the DID from the VC generated from your credential)",
                         "schema": {
                             "type": "string"
                         }
@@ -1276,15 +1189,37 @@
                                         "type": "string",
                                         "description": "The DID of the sender"
                                     },
+                                    "toDid": {
+                                        "type": "string",
+                                        "description": "The DID of the recipient"
+                                    },
                                     "message": {
                                         "type": "object",
                                         "properties": {
                                             "document": {
-                                                "type": "object",
+                                                "type": "string",
                                                 "description": "The document details of the message"
+                                            },
+                                            "vc": {
+                                                "type": "string",
+                                                "description": "The verifiable credential in JSON format, e.g., {\"id\": \"123\", \"type\": [\"VerifiableCredential\"], \"issuer\": \"did:example:issuer\", \"credentialSubject\": {\"id\": \"did:example:subject\"}}"
                                             }
                                         },
-                                        "description": "The message content, typically containing document details"
+                                        "description": "The message content, typically containing document details and VC"
+                                    },
+                                    "details": {
+                                        "type": "object",
+                                        "properties": {
+                                            "meta": {
+                                                "type": "string",
+                                                "description": "Additional metadata"
+                                            },
+                                            "documentTitle": {
+                                                "type": "string",
+                                                "description": "Title of the document"
+                                            }
+                                        },
+                                        "description": "Additional details for the message"
                                     },
                                     "type": {
                                         "type": "string",
@@ -1292,7 +1227,14 @@
                                         "description": "The type of the message"
                                     }
                                 },
-                                "required": ["id", "fromDid", "message", "type"]
+                                "required": [
+                                    "id",
+                                    "fromDid",
+                                    "toDid",
+                                    "message",
+                                    "details",
+                                    "type"
+                                ]
                             }
                         }
                     }
@@ -1333,7 +1275,9 @@
                     "401": { "$ref": "#/components/responses/Unauthorized" },
                     "500": { "$ref": "#/components/responses/ServerError" }
                 }
-            },
+            }
+        },
+        "/api/v1/message/{did}": {
             "get": {
                 "tags": ["Message Management"],
                 "summary": "Retrieve all messages for a specific DID",
@@ -1656,6 +1600,108 @@
                                             "example": "Internal server error"
                                         }
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/custom-user/create": {
+            "post": {
+                "tags": ["Custom-user"],
+                "summary": "Create a new custom user",
+                "description": "Creates a new custom user with the provided accountId, generates a decentralized identifier (DID), and issues a unique token.",
+                "operationId": "createCustomUser",
+                "requestBody": {
+                    "description": "Account ID of the user to be created",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomUserRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateUserResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accountId or user already exists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create user or generate token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/custom-user/regenerate-token": {
+            "post": {
+                "tags": ["Custom-user"],
+                "summary": "Regenerate token for an existing user",
+                "description": "Regenerates a new token for an existing user identified by the provided accountId, replacing any existing session token.",
+                "operationId": "regenerateToken",
+                "requestBody": {
+                    "description": "Account ID of the user to regenerate token for",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomUserRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Token regenerated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegenerateTokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid accountId or user does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to regenerate token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
