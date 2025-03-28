@@ -1,0 +1,3094 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "version": "1.4.1",
+        "title": "MARK Studio",
+        "description": "Space and #MARK Management APIs",
+        "termsOfService": "http://studio.dhiway.com/page/terms-and-conditions",
+        "contact": {
+            "name": "Dhiway Networks",
+            "email": "info@dhiway.com",
+            "url": "https://dhiway.com"
+        },
+        "license": {
+            "name": "Private",
+            "url": ""
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:5001/",
+            "description": "Local server"
+        },
+        {
+            "url": "https://api.demo.dhiway.com",
+            "description": "Staging server"
+        },
+        {
+            "url": "https://api.studio.dhiway.com",
+            "description": "Production server"
+        }
+    ],
+    "paths": {
+        "/api/v1/app": {
+            "get": {
+                "tags": ["Auth"],
+                "description": "Get app token",
+                "operationId": "token",
+                "responses": {
+                    "200": {
+                        "description": "App token details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AppToken"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas": {
+            "get": {
+                "tags": ["Schemas"],
+                "description": "Get schema list",
+                "operationId": "schemaDetails",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "count",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "number of schemas present"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "page to fetch (used in pagination)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "number of items to fetch (used in pagination)"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Schema details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SchemaListing"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/schemas/{schemaId}": {
+            "get": {
+                "tags": ["Schemas"],
+                "description": "Get schema by id",
+                "operationId": "schemaIdDetails",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "schemaId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Schema ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Specific schema details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SchemaDetails"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/spaces": {
+            "post": {
+                "tags": ["Space"],
+                "description": "Create a space",
+                "operationId": "spaceCreate",
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SpaceRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New space created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Space"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "error": "name is required field"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "get": {
+                "tags": ["Space"],
+                "description": "Get all spaces under Organization",
+                "operationId": "spaceIndex",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "page to fetch (used in pagination)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "number of items to fetch (used in pagination)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "active",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "1 fetches active spaces, and 0 fetches archived spaces"
+                    },
+                    {
+                        "in": "query",
+                        "name": "all",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": false,
+                        "description": "default behavior. Fetches both active and archived spaces"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of spaces",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SpaceListing"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/spaces/{spaceId}": {
+            "get": {
+                "tags": ["Space"],
+                "description": "Get space details",
+                "operationId": "spaceShow",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Space details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Space"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": ["Space"],
+                "description": "Update Space details / settings",
+                "operationId": "spaceUpdate",
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SpaceRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Space updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Space"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "error": "name is required field"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/spaces/{id}/activate": {
+            "post": {
+                "tags": ["Space"],
+                "description": "Activate a space by setting its active status to true",
+                "operationId": "spaceActivate",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Space activated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Space"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters or space ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to activate space",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/spaces/{id}/deactivate": {
+            "post": {
+                "tags": ["Space"],
+                "description": "Deactivate a space by setting its active status to false",
+                "operationId": "spaceDeactivate",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Space deactivated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Space"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters or space ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to deactivate space",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{spaceId}/records": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Create a Record",
+                "operationId": "recordCreate",
+                "requestBody": {
+                    "description": "Add a record to the given space",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RecordRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New Record created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Record"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "error": "title is required field"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "get": {
+                "tags": ["Record"],
+                "description": "Get all records belongs to a space",
+                "operationId": "recordIndex",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "page to fetch (used in pagination)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "number of items to fetch (used in pagination)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "active",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "1 fetches active records, and 0 fetches revoked records"
+                    },
+                    {
+                        "in": "query",
+                        "name": "draft",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "required": false,
+                        "description": "1 fetches draft records, and 0 fetches active/revoked records"
+                    },
+                    {
+                        "in": "query",
+                        "name": "all",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": false,
+                        "description": "default 'true'. fetch draft, active and revoked records"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of Records",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RecordListing"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{spaceId}/records/{recordId}": {
+            "get": {
+                "tags": ["Record"],
+                "description": "Record detail",
+                "operationId": "recordShow",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "recordId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Record ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Record details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Record"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": ["Record"],
+                "description": "Update a Record",
+                "operationId": "recordUpdate",
+                "requestBody": {
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RecordRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "recordId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Record ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Record updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Record"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "error": "title is required field"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": ["Record"],
+                "description": "Delete a Record",
+                "operationId": "deleteRecord",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "recordId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Record ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Record deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RecordDeleteRes"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "error": "title is required field"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{spaceId}/records/{recordId}/issue": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Create an issue of the Record",
+                "operationId": "issueRecord",
+                "requestBody": {
+                    "description": "Create an issue of the record and send it to the user",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IssueRecord"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "recordId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Record ID"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New Record issued",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Record"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "error": "title is required field"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{spaceId}/records/{recordId}/revoke": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Revoke a Record",
+                "operationId": "revokeRecord",
+                "requestBody": {
+                    "description": "Revoke the provided record",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RevokeRecord"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "recordId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Record ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Record revoked",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RevokeStatus"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                },
+                                "example": {
+                                    "error": "title is required field"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{spaceId}/records/edit": {
+            "get": {
+                "tags": ["Record"],
+                "description": "Retrieve a CSV file containing draft records for bulk editing",
+                "operationId": "recordBulkEditGet",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CSV file containing draft records",
+                        "content": {
+                            "text/csv": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid organization or no draft records available",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": ["Record"],
+                "description": "Upload a CSV file to edit records in bulk",
+                "operationId": "recordBulkEditPut",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "CSV file containing updated record data"
+                                    }
+                                },
+                                "required": ["file"]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Results of the bulk edit operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BulkEditResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid CSV or processing error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{spaceId}/records/issue": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Issue multiple records in bulk",
+                "operationId": "recordBulkCommit",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BulkIssueRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bulk issuance completed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success",
+                                            "description": "Status of the operation"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or no records found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized or space is archived",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{spaceId}/records/revoke": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Revoke multiple records in bulk",
+                "operationId": "recordBulkRevoke",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "requestBody": {
+                    "description": "Details for bulk revoking records",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BulkRevokeRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bulk revoke operation completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or no records found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{spaceId}/records/email": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Send emails for multiple records in bulk",
+                "operationId": "recordBulkEmail",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    }
+                ],
+                "requestBody": {
+                    "description": "Details for sending emails in bulk",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BulkEmailRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bulk email operation completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or no records found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{spaceId}/records/download": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Download multiple records in bulk",
+                "operationId": "recordBulkDownload",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "spaceId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Space ID"
+                    },
+                    {
+                        "in": "query",
+                        "name": "background",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["0", "1"]
+                        },
+                        "required": false,
+                        "description": "Include background in downloaded files (0 for false, 1 for true; defaults to true)"
+                    },
+                    {
+                        "in": "query",
+                        "name": "template",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": false,
+                        "description": "Template ID to use for rendering PDFs"
+                    },
+                    {
+                        "in": "query",
+                        "name": "hashcode_id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": false,
+                        "description": "Hashcode design ID for hashmark downloads (defaults to folder's hashmarkDesign or 'Frameless')"
+                    }
+                ],
+                "requestBody": {
+                    "description": "Details for downloading records in bulk",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BulkDownloadRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bulk download request received",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "recieved request, you will get an email once all files are generated (expected time 4 seconds/record)"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or no records found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{folderId}/records/delete": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Delete multiple records in bulk",
+                "operationId": "recordBulkDelete",
+                "requestBody": {
+                    "description": "Details for bulk deleting records",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BulkDeleteRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Folder ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Records deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters, no records provided, invalid org ID, or no records found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access or folder is archived",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{folderId}/records/summary-download": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Download a summary report of records in a folder as a CSV file",
+                "operationId": "recordFolderReportDownload",
+                "requestBody": {
+                    "description": "Filters for the record summary",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SummaryDownloadRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Folder ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CSV file containing the record summary",
+                        "content": {
+                            "text/csv": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters, no records found, or org identity failure",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{folderId}/records/refresh": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Refresh multiple records in bulk",
+                "operationId": "recordBulkRefresh",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Folder ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Refresh operation initiated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "No records found for refresh",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{folderId}/records/attach": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Attach files to multiple records in bulk",
+                "operationId": "recordBulkAttach",
+                "requestBody": {
+                    "description": "Details for bulk attaching files to records",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BulkAttachRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Folder ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Attach operation completed successfully or already in progress",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "attach on this space already in progress"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters, no records provided, no schema, or no files to attach",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access or folder is archived",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get organization identity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{folderId}/records/{id}/restore": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Restore a revoked record to an active state by creating a new version and anchoring it on the blockchain",
+                "operationId": "recordRestore",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Folder ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Record ID"
+                    }
+                ],
+                "requestBody": {
+                    "description": "Optional reason for restoring the record",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RecordRestoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Record restored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {}
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access (e.g., insufficient permissions)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Record, folder, or organization details not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to restore record (e.g., blockchain error or database failure)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{folderId}/records/{id}/update_pdf_hash": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Update the PDF hash of a specific record, restricted to authorized support personnel",
+                "operationId": "recordUpdatePdfHash",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Folder ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Record ID"
+                    }
+                ],
+                "requestBody": {
+                    "description": "New PDF hash to be added",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePdfHashRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF hash updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing PDF hash or failed to save record",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access (invalid support token)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Record not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{folderId}/records/fetchRecords": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Fetch details of multiple records by their public IDs for activity logging",
+                "operationId": "recordDetailsForActivity",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Folder ID"
+                    }
+                ],
+                "requestBody": {
+                    "description": "List of record public IDs to fetch",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FetchRecordsRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "List of record details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RecordActivityDetails"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid organization ID or folder not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{orgId}/{folderId}/records/upload-csv": {
+            "post": {
+                "tags": ["Record"],
+                "description": "Upload a CSV file to create multiple records in bulk",
+                "operationId": "recordUpload",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-UserId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "User ID for authentication"
+                    },
+                    {
+                        "in": "path",
+                        "name": "orgId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Organization ID"
+                    },
+                    {
+                        "in": "path",
+                        "name": "folderId",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "Folder ID"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RecordUploadRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bulk record creation completed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BulkUploadResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input (e.g., no file, limit exceeded, invalid schema)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access or folder is archived",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get organization identity or internal error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+        "schemas": {
+            "AppToken": {
+                "type": "object",
+                "properties": {
+                    "userId": { "$ref": "#/components/schemas/X-UserId" },
+                    "token": { "$ref": "#/components/schemas/Token" },
+                    "orgId": { "$ref": "#/components/schemas/OrgId" }
+                }
+            },
+            "BadgeId": {
+                "type": "string",
+                "example": "td8c599a9-4a2a-402d-9e5f-0039c36d2d86"
+            },
+            "Contact": { "type": "string", "example": "9734619734" },
+            "CreatedAt": {
+                "type": "string",
+                "example": "2023-01-06T18:24:13.459Z"
+            },
+            "Date": { "type": "string", "example": "01 mar 2023" },
+            "EmailAddress": { "type": "string", "example": "john@dhiway.com" },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "example": "domain is required field"
+                    }
+                }
+            },
+            "FirstName": { "type": "string", "example": "Jack" },
+            "HashmarkDesign": { "type": "string", "example": "Frameless" },
+            "IssueRecord": {
+                "type": "object",
+                "properties": {
+                    "issuer_message": {
+                        "type": "string",
+                        "example": "Record issued"
+                    },
+                    "need_cc": { "type": "boolean", "example": false },
+                    "send_email": { "type": "boolean", "example": false }
+                }
+            },
+            "OrgId": {
+                "type": "string",
+                "example": "o5725409b-7912-40c9-b7cd-8b2e607cf3f3"
+            },
+            "ProfileImage": { "type": "string", "example": "-" },
+            "Publish": { "type": "boolean", "example": true },
+            "Record": {
+                "type": "object",
+                "properties": {
+                    "id": { "$ref": "#/components/schemas/RecordId" },
+                    "publicId": {
+                        "$ref": "#/components/schemas/RecordPublicId"
+                    },
+                    "title": { "$ref": "#/components/schemas/RecordTitle" },
+                    "schemaId": { "$ref": "#/components/schemas/SchemaId" },
+                    "revoked": { "$ref": "#/components/schemas/RecordRevoked" },
+                    "active": { "$ref": "#/components/schemas/RecordRevoked" },
+                    "latest": { "$ref": "#/components/schemas/RecordRevoked" },
+                    "hash": { "$ref": "#/components/schemas/RecordHash" },
+                    "signature": {
+                        "$ref": "#/components/schemas/RecordSignature"
+                    },
+                    "transactionHash": {
+                        "$ref": "#/components/schemas/RecordTransactionHash"
+                    }
+                }
+            },
+            "RecordDeleteRes": {
+                "type": "object",
+                "properties": {
+                    "success": { "type": "boolean", "example": true }
+                }
+            },
+            "RecordHash": {
+                "type": "string",
+                "example": "a2e996e30ff823a507943864a9a7db3c168617acb845addb947eaf277f83ec4d"
+            },
+            "RecordId": {
+                "type": "string",
+                "example": "138a8cca-0404-11ed-ac97-cb7be2aeb26e"
+            },
+            "RecordListing": {
+                "type": "object",
+                "properties": {
+                    "count": { "type": "number", "example": "5" },
+                    "page": { "type": "number", "example": "0" },
+                    "pageSize": { "type": "number", "example": "20" },
+                    "records": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/Record" }
+                    }
+                }
+            },
+            "RecordPublicId": {
+                "type": "string",
+                "example": "138a8cca-0404-11ed-ac97-cb7be2aeb26e"
+            },
+            "RecordRequest": {
+                "type": "object",
+                "properties": {
+                    "name": { "$ref": "#/components/schemas/FirstName" },
+                    "email": { "$ref": "#/components/schemas/EmailAddress" },
+                    "publish": { "$ref": "#/components/schemas/Publish" },
+                    "join_date": { "$ref": "#/components/schemas/Date" },
+                    "contact": { "$ref": "#/components/schemas/Contact" },
+                    "employee_photo": {
+                        "$ref": "#/components/schemas/ProfileImage"
+                    }
+                }
+            },
+            "RecordRevoked": { "type": "boolean", "example": false },
+            "RecordSignature": {
+                "type": "string",
+                "example": "0x006f43832156cbc303463e94eef7631f75638319fe91add8bc170ca33836b29998251077b92ec57d199e60c94b3757e4189ab9bc331ecb8ad22135bfe9b1653e0a"
+            },
+            "RecordTitle": { "type": "string", "example": "Student Name" },
+            "RecordTransactionHash": {
+                "type": "string",
+                "example": "0xc33442028e179c347515890d9a53f7b827811b254cdaa441d468fe0bd256b334"
+            },
+            "RevokeRecord": {
+                "type": "object",
+                "properties": {
+                    "reason": { "type": "string", "example": "Expired" }
+                }
+            },
+            "RevokeStatus": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "Revoked successfully"
+                    }
+                }
+            },
+            "SchemaActive": { "type": "boolean", "example": true },
+            "SchemaDetails": {
+                "type": "object",
+                "properties": {
+                    "active": { "$ref": "#/components/schemas/SchemaActive" },
+                    "category": { "type": "string", "example": "custom" },
+                    "createdAt": { "$ref": "#/components/schemas/CreatedAt" },
+                    "description": {
+                        "type": "string",
+                        "example": "This #MARK Type is made available to showcase how #MARK Studio can be used to generate Identity cards or visiting cards."
+                    },
+                    "id": { "$ref": "#/components/schemas/SchemaId" },
+                    "jsonSchema": { "type": "string", "example": "null" },
+                    "latest": { "type": "boolean", "example": true },
+                    "orgId": { "$ref": "#/components/schemas/OrgId" },
+                    "properties": { "type": "string", "example": "" },
+                    "public": { "type": "boolean", "example": true },
+                    "registry": { "type": "boolean", "example": false },
+                    "title": { "type": "string", "example": "Identity" },
+                    "updatedAt": { "$ref": "#/components/schemas/UpdatedAt" }
+                }
+            },
+            "SchemaId": {
+                "type": "string",
+                "example": "dway:mtype:0xf07e4b23b4540240687a61538249b313a209633272e14d6637e572387bf55d9c"
+            },
+            "SchemaListing": {
+                "type": "object",
+                "properties": {
+                    "count": { "type": "number", "example": 5 },
+                    "page": { "type": "number", "example": 0 },
+                    "pageSize": { "type": "number", "example": 20 },
+                    "badges": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/BadgeId" }
+                    },
+                    "schemas": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/SchemaId" }
+                    }
+                }
+            },
+            "Space": {
+                "type": "object",
+                "properties": {
+                    "id": { "$ref": "#/components/schemas/SpaceId" },
+                    "name": { "$ref": "#/components/schemas/SpaceName" },
+                    "description": {
+                        "$ref": "#/components/schemas/SpaceDescription"
+                    },
+                    "active": { "$ref": "#/components/schemas/SpaceActive" },
+                    "schemaId": { "$ref": "#/components/schemas/SchemaId" },
+                    "template": { "$ref": "#/components/schemas/Template" },
+                    "OrgId": { "$ref": "#/components/schemas/OrgId" },
+                    "tags": { "$ref": "#/components/schemas/SpaceTags" }
+                }
+            },
+            "SpaceActive": { "type": "boolean", "example": true },
+            "SpaceDescription": {
+                "type": "string",
+                "example": "This space contains records of participation certificate"
+            },
+            "SpaceId": {
+                "type": "string",
+                "example": "5725409b-7912-40c9-b7cd-8b2e607cf3f3"
+            },
+            "SpaceListing": {
+                "type": "object",
+                "properties": {
+                    "count": { "type": "number", "example": "5" },
+                    "page": { "type": "number", "example": "0" },
+                    "pageSize": { "type": "number", "example": "20" },
+                    "spaces": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/Space" }
+                    }
+                }
+            },
+            "SpaceName": {
+                "type": "string",
+                "example": "Event XYZ Participation"
+            },
+            "SpaceRequest": {
+                "type": "object",
+                "properties": {
+                    "name": { "$ref": "#/components/schemas/SpaceName" },
+                    "description": {
+                        "$ref": "#/components/schemas/SpaceDescription"
+                    },
+                    "hashmarkDesign": {
+                        "$ref": "#/components/schemas/HashmarkDesign"
+                    },
+                    "badgeUrl": { "type": "string", "example": "https://xyz" },
+                    "webURL": { "type": "string", "example": "https://abc" },
+                    "tags": { "$ref": "#/components/schemas/SpaceTags" },
+                    "status": { "$ref": "#/components/schemas/Status" },
+                    "template": { "$ref": "#/components/schemas/Template" }
+                }
+            },
+            "SpaceTags": {
+                "type": "array",
+                "example": ["Course 1", "Quick Learner"]
+            },
+            "Status": { "type": "string", "example": "Incomplete" },
+            "Template": {
+                "type": "string",
+                "example": "sol_global_schl_idcard"
+            },
+            "Token": {
+                "type": "string",
+                "example": "be7ad44f841236fb925adb51d6ad3511be8b29d34ab1ca6bee5b6ff1d5a56c48"
+            },
+            "UpdatedAt": {
+                "type": "string",
+                "example": "2023-01-06T18:24:13.459Z"
+            },
+            "X-UserId": {
+                "type": "string",
+                "example": "u1f1b9b3d-c07d-4c8e-901f-6445aa6aef8e"
+            },
+            "BulkEditResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": { "row": { "type": "object" } }
+                        },
+                        "description": "List of successfully updated records"
+                    },
+                    "failure": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "row": { "type": "object" },
+                                "error": {
+                                    "type": "string",
+                                    "example": "draft record not found"
+                                }
+                            }
+                        },
+                        "description": "List of records that failed to update"
+                    }
+                }
+            },
+            "BulkIssueRequest": {
+                "type": "object",
+                "properties": {
+                    "all": {
+                        "type": "boolean",
+                        "description": "If true, issues all draft records in the space"
+                    },
+                    "records": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "List of record public IDs to issue (ignored if 'all' is true)"
+                    },
+                    "send_email": {
+                        "type": "boolean",
+                        "description": "Whether to send email notifications"
+                    },
+                    "need_cc": {
+                        "type": "boolean",
+                        "description": "Whether the issuer needs a copy"
+                    },
+                    "issuer_message": {
+                        "type": "string",
+                        "description": "Optional message from the issuer"
+                    }
+                }
+            },
+            "BulkRevokeRequest": {
+                "type": "object",
+                "properties": {
+                    "all": {
+                        "type": "boolean",
+                        "description": "If true, revoke all active records in the space"
+                    },
+                    "records": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "List of record public IDs to revoke (ignored if 'all' is true)"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Reason for revoking the records"
+                    }
+                }
+            },
+            "BulkEmailRequest": {
+                "type": "object",
+                "properties": {
+                    "all": {
+                        "type": "boolean",
+                        "description": "If true, send emails for all active records in the space"
+                    },
+                    "records": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "List of record public IDs to send emails for (ignored if 'all' is true)"
+                    },
+                    "need_admin_cc": {
+                        "type": "boolean",
+                        "description": "Whether to CC the admin"
+                    },
+                    "need_cc": {
+                        "type": "boolean",
+                        "description": "Whether to CC the issuer"
+                    },
+                    "issuer_message": {
+                        "type": "string",
+                        "description": "Optional message from the issuer"
+                    },
+                    "ccEmail": {
+                        "type": "string",
+                        "description": "Email address for CC"
+                    }
+                }
+            },
+            "BulkDownloadRequest": {
+                "type": "object",
+                "properties": {
+                    "all": {
+                        "type": "boolean",
+                        "description": "If true, download all active records in the space"
+                    },
+                    "records": {
+                        "type": "array",
+                        "items": { "type": "string" },
+                        "description": "List of record public IDs to download (ignored if 'all' is true)"
+                    },
+                    "filetype": {
+                        "type": "string",
+                        "enum": ["zip", "pdf"],
+                        "description": "Type of file to download (zip or single PDF)"
+                    },
+                    "content": {
+                        "type": "string",
+                        "enum": ["hashmark", "pdf"],
+                        "description": "Content type to download (hashmark QR code or PDF document)"
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": ["png", "jpeg", "pdf"],
+                        "description": "Format of the downloaded content (applies to PDFs; hashmarks use png or svg)"
+                    }
+                }
+            },
+            "BulkDeleteRequest": {
+                "type": "object",
+                "properties": {
+                    "all": {
+                        "type": "boolean",
+                        "description": "If true, deletes all records in the folder"
+                    },
+                    "records": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of record public IDs to delete (ignored if 'all' is true)"
+                    }
+                }
+            },
+            "SummaryDownloadRequest": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean",
+                        "description": "Include active records"
+                    },
+                    "revoked": {
+                        "type": "boolean",
+                        "description": "Include revoked records"
+                    },
+                    "draft": {
+                        "type": "boolean",
+                        "description": "Include draft records"
+                    }
+                }
+            },
+            "BulkAttachRequest": {
+                "type": "object",
+                "properties": {
+                    "all": {
+                        "type": "boolean",
+                        "description": "If true, attaches files to all records in the folder"
+                    },
+                    "records": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of record public IDs to attach files to (ignored if 'all' is true)"
+                    },
+                    "send_email": {
+                        "type": "boolean",
+                        "description": "Whether to send email notifications"
+                    },
+                    "issuer_message": {
+                        "type": "string",
+                        "description": "Optional message from the issuer"
+                    },
+                    "schemaId": {
+                        "type": "string",
+                        "description": "Optional schema ID (defaults to folder's schema ID if not provided)"
+                    }
+                }
+            },
+            "RecordRestoreRequest": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "description": "Optional reason for restoring the record",
+                        "default": "-"
+                    }
+                }
+            },
+            "UpdatePdfHashRequest": {
+                "type": "object",
+                "properties": {
+                    "pdf_hash": {
+                        "type": "string",
+                        "description": "New PDF hash to be added to the record"
+                    }
+                },
+                "required": ["pdf_hash"]
+            },
+            "FetchRecordsRequest": {
+                "type": "object",
+                "properties": {
+                    "records": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of record public IDs to fetch"
+                    }
+                },
+                "required": ["records"]
+            },
+            "RecordActivityDetails": {
+                "type": "object",
+                "properties": {
+                    "active": {
+                        "type": "boolean"
+                    },
+                    "revoked": {
+                        "type": "boolean"
+                    },
+                    "recipients": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "publicId": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "expires": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "anchorTime": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "edited": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "RecordUploadRequest": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary",
+                        "description": "CSV file containing record data"
+                    },
+                    "publish": {
+                        "type": "boolean",
+                        "description": "Whether to publish records immediately",
+                        "default": false
+                    },
+                    "schemaId": {
+                        "type": "string",
+                        "description": "Schema ID to use for records (defaults to folder schema)"
+                    },
+                    "send_email": {
+                        "type": "boolean",
+                        "description": "Whether to send email notifications",
+                        "default": false
+                    },
+                    "need_cc": {
+                        "type": "boolean",
+                        "description": "Whether to include CC recipients",
+                        "default": false
+                    },
+                    "need_admin_cc": {
+                        "type": "boolean",
+                        "description": "Whether to CC admin recipients",
+                        "default": false
+                    },
+                    "issuer_message": {
+                        "type": "string",
+                        "description": "Optional message from the issuer"
+                    },
+                    "ccEmail": {
+                        "type": "string",
+                        "description": "Email address for CC recipients"
+                    }
+                },
+                "required": ["file"]
+            },
+            "BulkUploadResponse": {
+                "type": "object",
+                "properties": {
+                    "response": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "row": {
+                                    "type": "object"
+                                },
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "List of processed records with success or error details"
+                    },
+                    "success": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "row": {
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "List of successfully created records"
+                    },
+                    "failure": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "row": {
+                                    "type": "object"
+                                },
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "List of records that failed to be created"
+                    },
+                    "usage": {
+                        "type": "object",
+                        "description": "Updated usage statistics for the organization",
+                        "properties": {
+                            "recipients": {
+                                "type": "integer"
+                            },
+                            "records": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
