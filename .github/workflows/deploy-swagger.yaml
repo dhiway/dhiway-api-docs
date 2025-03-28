@@ -43,15 +43,14 @@ jobs:
               cp -r node_modules/swagger-ui-dist/* "docs/$filename/"
               # Copy the API spec file
               cp "$file" "docs/$filename/"
-              # Update swagger-initializer.js to point to the specific api.yaml
               sed -i "s|https://petstore.swagger.io/v2/swagger.json|./$filename.json|" "docs/$filename/swagger-initializer.js"
             fi
           done
           # Optional: Create an index.html to list all APIs
           echo "<!DOCTYPE html><html><title>Dhiway APIs</title><body><h1>Dhiway API Specifications</h1><ul>" > docs/index.html
-          for file in "$API_DIR"/*.yaml; do
+          for file in "$API_DIR"/*.json; do
             if [ -f "$file" ]; then
-              filename=$(basename "$file" .yaml)
+              filename=$(basename "$file" .json)
               echo "<li><a href=\"./$filename/\">$filename</a></li>" >> docs/index.html
             fi
           done
