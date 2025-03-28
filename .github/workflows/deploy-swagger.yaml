@@ -21,7 +21,9 @@ jobs:
 
       # Install Swagger UI
       - name: Install dependencies
-        run: npm install -g swagger-ui-dist
+        run: |
+          npm init -y  # Create a temporary package.json
+          npm install swagger-ui-dist --save
 
       # Generate documentation for each API spec
       - name: Generate API Documentation
