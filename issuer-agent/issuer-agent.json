@@ -1,0 +1,699 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.4.1",
+    "title": "Issuer Agent",
+    "description": "API for managing schemas and verifiable credentials in a wallet agent.",
+    "termsOfService": "http://studio.dhiway.com/page/terms-and-conditions",
+    "contact": {
+      "name": "Dhiway Networks",
+      "email": "info@dhiway.com",
+      "url": "https://dhiway.com"
+    },
+    "license": {
+      "name": "Apache v2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://issuer-agent-api.demo.dhiway.net",
+      "description": "Demo server"
+    },
+    {
+      "url": "http://localhost:5106/",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/api/v1/schema": {
+      "post": {
+        "tags": [
+          "Schema"
+        ],
+        "description": "Create a new schema definition on the blockchain. This schema can later be used to issue verifiable credentials.",
+        "operationId": "createSchema",
+        "requestBody": {
+          "description": "Schema definition to be created, including title, description, and properties.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchemaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "New schema created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid schema format or missing required fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/schema/{id}": {
+      "get": {
+        "tags": [
+          "Schema"
+        ],
+        "description": "Retrieve a schema by its unique identifier from the blockchain.",
+        "operationId": "getSchemaById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Unique identifier of the schema (e.g., schema:cord:s33Nap3uKe3A3DTuroTEXFUBbkG5P3WRE9RcJFJDxh5Ktc14v)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Schema retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetSchemaRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid schema ID format.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Schema with the specified ID not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchemaNotFound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/cred": {
+      "post": {
+        "tags": [
+          "Verifiable Credential"
+        ],
+        "description": "Issue a new verifiable credential (VC) to a specified holder using a predefined schema.",
+        "operationId": "issueCred",
+        "requestBody": {
+          "description": "Details required to issue the VC, including the schema ID, credential properties such as holder DID, and validity timestamps.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "New verifiable credential issued successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data or missing required fields (e.g., schemaId or holderDid).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "result": "VC not issued"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/cred/{id}": {
+      "get": {
+        "tags": [
+          "Verifiable Credential"
+        ],
+        "description": "Retrieve a verifiable credential by its unique identifier.",
+        "operationId": "getCredById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Unique identifier of the credential (e.g., c0aa3623b-903f-4ae1-ab0f-ed65eb6b5e77)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Credential retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCredRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid credential ID format.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Invalid credential ID"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Credential with the specified ID not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Credential not found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/cred/update/{id}": {
+      "put": {
+        "tags": [
+          "Verifiable Credential"
+        ],
+        "description": "Update the properties of an existing verifiable credential identified by its unique identifier.",
+        "operationId": "updateCred",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Unique identifier of the credential to update."
+          }
+        ],
+        "requestBody": {
+          "description": "Updated properties for the credential, such as name, email, or age.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Credential updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredUpdateRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid update request or missing required fields.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Statement not updated"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Credential with the specified ID not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Credential not found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/cred/revoke/{id}": {
+      "post": {
+        "tags": [
+          "Verifiable Credential"
+        ],
+        "description": "Revoke a previously issued verifiable credential by its identifier.",
+        "operationId": "revokeCred",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Unique identifier of the credential to revoke."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Credential revoked successfully. No content returned."
+          },
+          "400": {
+            "description": "Invalid credential ID format.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Invalid credential ID"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Credential with the specified ID not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Credential not found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "SchemaError": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string",
+            "description": "Error message detailing why the schema operation failed.",
+            "example": "Schema not created"
+          }
+        }
+      },
+      "SchemaNotFound": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Error message indicating the schema was not found.",
+            "example": "Schema not found"
+          }
+        }
+      },
+      "SchemaRequest": {
+        "type": "object",
+        "properties": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Title of the schema.",
+                "example": "Event XYZ Participation"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the schema.",
+                "example": "Description of the title"
+              },
+              "properties": {
+                "type": "object",
+                "description": "Schema properties defining the structure of the credential.",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "schema"
+        ]
+      },
+      "SchemaRes": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string",
+            "description": "Status of the schema creation.",
+            "example": "SUCCESS"
+          },
+          "schemaId": {
+            "type": "string",
+            "description": "Unique identifier of the created schema.",
+            "example": "schema:cord:s34ouTR2XCJprL48EbkyhNV4SSsbQU9JGN4KhJbAerz6wEVWC"
+          }
+        }
+      },
+      "GetSchemaRes": {
+        "type": "object",
+        "properties": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier of the schema.",
+                "example": "schema:cord:s33Nap3uKe3A3DTuroTEXFUBbkG5P3WRE9RcJFJDxh5Ktc14v"
+              },
+              "identifier": {
+                "type": "string",
+                "description": "Alternative schema identifier.",
+                "example": "s1f1b9b3d-c07d-4c8e-901f-6445aa6aef8e"
+              },
+              "title": {
+                "type": "string",
+                "description": "Title of the schema.",
+                "example": "Event XYZ Participation"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the schema.",
+                "example": "Description of the title"
+              },
+              "cordSchema": {
+                "type": "object",
+                "description": "Cord-specific schema details.",
+                "properties": {
+                  "$id": {
+                    "type": "string",
+                    "example": "schema:cord:m3xcC65uSJmyoeciGiKmpF4zKiCq8F2Qz1npCmitXMZbJXqBV"
+                  },
+                  "additionalProperties": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    }
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "Event XYZ Participation"
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "RecordRequest": {
+        "type": "object",
+        "properties": {
+          "schemaId": {
+            "type": "string",
+            "description": "Identifier of the schema used to issue the credential.",
+            "example": "schema:cord:s34ouTR2XCJprL48EbkyhNV4SSsbQU9JGN4KhJbAerz6wEVWC"
+          },
+          "properties": {
+            "type": "object",
+            "description": "Credential properties including holder information.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Jack"
+              },
+              "email": {
+                "type": "string",
+                "example": "jack@dhiway.com"
+              },
+              "age": {
+                "type": "number",
+                "example": 23
+              },
+              "holderDid": {
+                "type": "string",
+                "description": "DID of the credential holder.",
+                "example": "did:cord:3wCdDiKx3GdRM8p79QYL5EE7NbaiwrL7T2C46QMBfadr9nre"
+              }
+            }
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date and time from which the credential is valid.",
+            "example": "2025-03-24T09:02:56.793Z"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date and time until which the credential is valid.",
+            "example": "2025-03-26T09:02:56.793Z"
+          }
+        },
+        "required": [
+          "schemaId",
+          "properties"
+        ]
+      },
+      "CredRes": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string",
+            "description": "Status of the credential issuance.",
+            "example": "SUCCESS"
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Unique identifier of the issued credential.",
+            "example": "stmt:cord:s3dgvtunhXyxg5oBb1QNaqR9NvhF3tnQoLj2jmNBHiW4cYzby:d528de06ecb92d68b33c77c627c2dac6f08ed2507e4bd1ca00456f9635c94af6"
+          }
+        }
+      },
+      "GetCredRes": {
+        "type": "object",
+        "properties": {
+          "credential": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CredProp"
+              },
+              {
+                "type": "object",
+                "description": "Detailed credential content."
+              }
+            ]
+          },
+          "details": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MetaDetails"
+              },
+              {
+                "type": "object",
+                "description": "Metadata about the credential."
+              }
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the credential.",
+            "example": "c0aa3623b-903f-4ae1-ab0f-ed65eb6b5e77"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indicates if the credential is currently active.",
+            "example": true
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Alternative identifier for the credential.",
+            "example": "stmt:cord:s3dgvtunhXyxg5oBb1QNaqR9NvhF3tnQoLj2jmNBHiW4cYzby:d528de06ecb92d68b33c77c627c2dac6f08ed2507e4bd1ca00456f9635c94af6"
+          },
+          "fromDid": {
+            "type": "string",
+            "description": "DID of the issuer.",
+            "example": "did:cord:3wCdDiKx3GdRM8p79QYL5EE7NbaiwrL7T2C46QMBfadr9nre"
+          },
+          "credHash": {
+            "type": "string",
+            "description": "Hash of the credential content.",
+            "example": 8.431085033657725e+75
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of credential creation.",
+            "example": "2023-05-05T18:01:09.109Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp of the last update.",
+            "example": "2023-05-05T18:01:09.109Z"
+          }
+        }
+      },
+      "CredUpdateRes": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string",
+            "description": "Status of the update operation.",
+            "example": "Updated successfully"
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Updated credential identifier.",
+            "example": "stmt:cord:s3dgvtunhXyxg5oBb1QNaqR9NvhF3tnQoLj2jmNBHiW4cYzby:de689c81fae40362f8f6a9ca228e9d3389e15d0ba8199066366264b017454066"
+          }
+        }
+      },
+      "UpdateRequest": {
+        "type": "object",
+        "properties": {
+          "properties": {
+            "type": "object",
+            "description": "Updated credential properties.",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Jack"
+              },
+              "email": {
+                "type": "string",
+                "example": "jack@dhiway.com"
+              },
+              "age": {
+                "type": "number",
+                "example": 23
+              }
+            }
+          }
+        }
+      },
+      "CredProp": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "example": "stream:cord:s3hB4khxYv6rKf4T47zXzeqBT4dQoaowSeiTfHYA1B8ucVKE3"
+          },
+          "content": {
+            "type": "object",
+            "description": "Core content of the credential.",
+            "example": {
+              "schemaId": "schema:cord:m3tdRqo3NeTGnR7t5K2qgx1723nVEwj5b6b122stndyfA1gum",
+              "contents": {
+                "name": "alex",
+                "email": "alex@dhiway",
+                "age": 23
+              },
+              "holder": "did:cord:3wCdDiKx3GdRM8p79QYL5EE7NbaiwrL7T2C46QMBfadr9nre",
+              "issuer": "did:cord:3yzW2BjxDwgzZJ6adJ2Ueg758dmxL3gRJi6FqYy66FQMSsvy"
+            }
+          }
+        }
+      },
+      "MetaDetails": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "type": "string",
+            "description": "Metadata description.",
+            "example": "endpoint-received"
+          }
+        }
+      }
+    }
+  }
+}
