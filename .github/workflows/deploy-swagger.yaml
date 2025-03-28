@@ -33,11 +33,10 @@ jobs:
           cp -r node_modules/swagger-ui-dist/* docs/
           # Directory containing your API specs
           API_DIR="swagger"
-          # Loop through all .yaml files in the api/ directory
-          for file in "$API_DIR"/*.yaml; do
+          for file in "$API_DIR"/*.json; do
             if [ -f "$file" ]; then
               # Extract the filename without path and extension
-              filename=$(basename "$file" .yaml)
+              filename=$(basename "$file" .json)
               # Create a subdirectory for each API
               mkdir -p "docs/$filename"
               # Copy Swagger UI files to the subdirectory
@@ -45,7 +44,7 @@ jobs:
               # Copy the API spec file
               cp "$file" "docs/$filename/"
               # Update swagger-initializer.js to point to the specific api.yaml
-              sed -i "s|https://petstore.swagger.io/v2/swagger.json|./$filename.yaml|" "docs/$filename/swagger-initializer.js"
+              sed -i "s|https://petstore.swagger.io/v2/swagger.json|./$filename.json|" "docs/$filename/swagger-initializer.js"
             fi
           done
           # Optional: Create an index.html to list all APIs
