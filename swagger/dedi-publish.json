@@ -13,6 +13,12 @@
       "name": "Apache 2.0"
     }
   },
+  "servers": [
+    {
+      "url": "https://demo.lookup.dedi.global",
+      "description": "Demo Server"
+    }
+  ],
   "components": {
     "securitySchemes": {
       "bearerAuth": {
