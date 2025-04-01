@@ -1,8 +1,8 @@
 ﻿{
   "openapi": "3.0.0",
   "info": {
-    "title": "DeDi",
-    "description": "Decentralized Directory - Publish and Access",
+    "title": "dedi",
+    "description": "Decentralized Directory - Publish",
     "contact": {
       "name": "Dhiway",
       "email": "finternet@dhiway.com",
@@ -15,12 +15,12 @@
   },
   "servers": [
     {
-      "url": "http://localhost:5106",
-      "description": "Localhost"
-    },
-    {
       "url": "https://demo.lookup.dedi.global",
       "description": "Demo"
+    },
+    {
+      "url": "http://localhost:5106",
+      "description": "Localhost"
     }
   ],
   "components": {
