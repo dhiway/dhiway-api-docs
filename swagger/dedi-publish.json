@@ -15,8 +15,12 @@
   },
   "servers": [
     {
+      "url": "http://localhost:5106",
+      "description": "Localhost"
+    },
+    {
       "url": "https://demo.lookup.dedi.global",
-      "description": "Demo Server"
+      "description": "Demo"
     }
   ],
   "components": {
@@ -288,7 +292,51 @@
         }
       }
     },
-    "/dedi/{namespace}/add-registry": {
+    "/dedi/create-namespace": {
+      "post": {
+        "tags": [
+          "Publish"
+        ],
+        "summary": "Create a new namespace",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "created"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/create-registry": {
       "post": {
         "tags": [
           "Publish"
