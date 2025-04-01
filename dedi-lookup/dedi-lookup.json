@@ -13,6 +13,16 @@
     },
     "version": "0.1.1"
   },
+  "servers": [
+    {
+      "url": "http://localhost:5106",
+      "description": "Localhost"
+    },
+    {
+      "url": "https://demo.lookup.dedi.global",
+      "description": "Demo"
+    }
+  ],
   "paths": {
     "/dedi/lookup/{namespace}": {
       "get": {
