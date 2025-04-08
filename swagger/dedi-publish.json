@@ -382,6 +382,10 @@
                   },
                   "query_allowed": {
                     "type": "boolean"
+                  },
+                  "meta": {
+                  "type": "object",
+                  "additionalProperties": true
                   }
                 }
               }
@@ -450,6 +454,10 @@
                     "additionalProperties": {
                       "type": "string"
                     }
+                  },
+                  "meta": {
+                  "type": "object",
+                  "additionalProperties": true
                   }
                 }
               }
