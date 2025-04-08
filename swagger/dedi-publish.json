@@ -315,6 +315,10 @@
                   },
                   "description": {
                     "type": "string"
+                 },
+                "meta": {
+                  "type": "object",
+                  "additionalProperties": true
                   }
                 }
               }
