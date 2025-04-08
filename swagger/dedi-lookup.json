@@ -271,7 +271,7 @@
             "description": "Namespace ID or verified domain"
           },
           {
-            "name": "from",
+            "name": "from_string",
             "in": "query",
             "description": "Filter by creation date (from). Default is registry creation date",
             "schema": {
@@ -280,7 +280,7 @@
             }
           },
           {
-            "name": "to",
+            "name": "to_string",
             "in": "query",
             "description": "Filter by creation date (to). Default is current date",
             "schema": {
@@ -289,7 +289,7 @@
             }
           },
           {
-            "name": "status",
+            "name": "status_string",
             "in": "query",
             "description": "Filter by registry status",
             "schema": {
@@ -297,7 +297,7 @@
             }
           },
           {
-            "name": "name",
+            "name": "name_string",
             "in": "query",
             "description": "Filter by registry name (minimum 3 characters)",
             "schema": {
@@ -305,7 +305,7 @@
             }
           },
           {
-            "name": "sort",
+            "name": "sort_string",
             "in": "query",
             "description": "Sort results by field (ascending)",
             "schema": {
@@ -319,7 +319,7 @@
             }
           },
           {
-            "name": "page",
+            "name": "page_number",
             "in": "query",
             "description": "Pagination offset (default: 0)",
             "schema": {
@@ -467,7 +467,7 @@
             }
           },
           {
-            "name": "from",
+            "name": "from_string",
             "in": "query",
             "description": "Filter by creation date (from). Default is record creation date",
             "schema": {
@@ -476,7 +476,7 @@
             }
           },
           {
-            "name": "to",
+            "name": "to_string",
             "in": "query",
             "description": "Filter by creation date (to). Default is current date",
             "schema": {
@@ -485,7 +485,7 @@
             }
           },
           {
-            "name": "status",
+            "name": "status_string",
             "in": "query",
             "description": "Filter by record status",
             "schema": {
@@ -493,7 +493,7 @@
             }
           },
           {
-            "name": "name",
+            "name": "name_string",
             "in": "query",
             "description": "Filter by record name (minimum 3 characters)",
             "schema": {
@@ -501,7 +501,7 @@
             }
           },
           {
-            "name": "sort",
+            "name": "sort_string",
             "in": "query",
             "description": "Sort results by field (ascending)",
             "schema": {
@@ -515,7 +515,7 @@
             }
           },
           {
-            "name": "page",
+            "name": "page_number",
             "in": "query",
             "description": "Pagination offset (default: 0)",
             "schema": {
