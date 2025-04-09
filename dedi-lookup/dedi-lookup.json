@@ -764,6 +764,10 @@
           "registry_count": {
             "type": "integer",
             "description": "Number of registries in this namespace"
+          },
+          "meta":{
+            "type": "object",
+            "description": "Meta data of namespace"
           }
         }
       },
@@ -820,6 +824,10 @@
           "query_allowed": {
             "type": "boolean",
             "description": "Indicates if query operations are permitted"
+          },
+          "meta":{
+            "type": "object",
+            "description": "Meta data of registry"
           }
         },
         "required": [
@@ -871,6 +879,10 @@
                 "created_at": {
                   "type": "string",
                   "format": "date-time"
+                },
+                "meta":{
+                "type": "object",
+                "description": "Meta data of registry"
                 }
               }
             }
@@ -929,6 +941,10 @@
                 "created_at": {
                   "type": "string",
                   "format": "date-time"
+                },
+                "meta":{
+                  "type": "object",
+                  "description": "Meta data of record"
                 }
               }
             }
@@ -996,6 +1012,10 @@
           "created_by": {
             "type": "string",
             "description": "Creator of the record"
+          },
+          "meta":{
+            "type": "object",
+            "description": "Meta data of record"
           }
         },
         "required": [
