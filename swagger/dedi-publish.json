@@ -656,6 +656,110 @@
         }
       }
     },
+    "/dedi/{namespace}/{registry_name}/{record_name}/archive-record": {
+      "post": {
+        "tags": [
+          "State management"
+        ],
+        "summary": "Archive a record",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "record_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record archived",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Record archived"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/{record_name}/restore-record": {
+      "post": {
+        "tags": [
+          "State management"
+        ],
+        "summary": "Restore a record",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "record_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record restored",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Record restored"
+              }
+            }
+          }
+        }
+      }
+    },
     "/dedi/{namespace}/bulk-upload": {
       "post": {
         "tags": [
