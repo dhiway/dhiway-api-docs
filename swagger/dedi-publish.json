@@ -479,6 +479,66 @@
         }
       }
     },
+    "/dedi/{namespace}/update-namepsace": {
+      "post": {
+        "tags": [
+          "Update"
+        ],
+        "summary": "Update an existing namepsace",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "meta": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Updated",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "updated"
+              }
+            }
+          }
+        }
+      }
+    },
     "/dedi/{namespace}/{registry_name}/{record_name}/update-record": {
       "post": {
         "tags": [

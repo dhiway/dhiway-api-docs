@@ -628,6 +628,88 @@
         }
       }
     },
+    "/dedi/versions/{namespace}": {
+      "get": {
+        "tags": [
+          "Version API"
+        ],
+        "description": "Get all versions of a specific namespace",
+        "operationId": "getNamespaceVersions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Namespace ID or verified domain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with version information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NamepsaceVersionLookup"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Namepsace Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Locked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "451": {
+            "description": "Not available for legal reasons",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Method not implemented",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dedi/versions/{namespace}/{registry_name}/{record_name}": {
       "get": {
         "tags": [
@@ -1025,6 +1107,33 @@
           "created_at",
           "created_by"
         ]
+      },
+      "NamepsaceVersionLookup": {
+        "type": "object",
+        "description": "Record version information",
+        "properties": {
+          "namespace_id": {
+            "type": "string",
+            "description": "Unique record identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Record name"
+          },
+          "total_versions": {
+            "type": "integer",
+            "description": "Total number of versions",
+            "default": 1
+          },
+          "versions": {
+            "type": "array",
+            "description": "List of all versions",
+            "items": {
+              "type": "array",
+              "default": "e3b0c44298fc1c149afbae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
       },
       "RecordVersionLookup": {
         "type": "object",
