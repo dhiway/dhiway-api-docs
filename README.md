@@ -2,6 +2,8 @@
 
 This repository contains API documentation for Dhiway.
 
+📄 View the documentation here: https://dhiway.github.io/dhiway-api-docs/
+
 ## 📂 Structure
 
 - **swagger/** - Contains OpenAPI/Swagger documentation files.
