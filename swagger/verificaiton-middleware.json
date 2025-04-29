@@ -24,6 +24,7 @@
   "paths": {
     "/api/v1/verify/credentials/verify": {
       "post": {
+        "tags": ["Credential"],
         "summary": "Verify a Verifiable Credential",
         "description": "Verifies the given Verifiable Credential (VC) and returns validation checks.",
         "requestBody": {
@@ -36,19 +37,117 @@
                 "additionalProperties": true,
                 "example": {
                   "@context": [
-                    "https://www.w3.org/2018/credentials/v1"
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://cord.network/2023/cred/v1"
                   ],
-                  "type": [
-                    "VerifiableCredential"
-                  ],
-                  "issuer": "did:example:123",
+                  "type": ["VerifiableCredential"],
+                  "issuer": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX",
+                  "issuanceDate": "2025-03-16T14:51:15.500Z",
                   "credentialSubject": {
-                    "id": "did:example:456"
+                    "name": "demoschema",
+                    "email": "",
+                    "cert_id": "",
+                    "event": "",
+                    "cert_name": "",
+                    "grade": "",
+                    "start_date": "",
+                    "end_date": "",
+                    "issue_date": "",
+                    "id": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX",
+                    "@context": {
+                      "vocab": "schema:cord:s33JPd1FdhZfxDrTxWnabXKL5dq68o6Z6yENa8tJgh1ak8C3K#"
+                    }
                   },
-                  "proof": {
-                    "type": "CordProof2024",
-                    "created": "2024-01-01T00:00:00Z"
-                  }
+                  "validFrom": "2025-03-16T14:51:15.500Z",
+                  "validUntil": "2026-03-16T14:51:15.500Z",
+                  "metadata": {},
+                  "credentialSchema": {
+                    "$id": "schema:cord:s33JPd1FdhZfxDrTxWnabXKL5dq68o6Z6yENa8tJgh1ak8C3K",
+                    "title": "Certificate Schema:937cf308-70ed-4c55-a489-ee09b80d951f",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      },
+                      "cert_id": {
+                        "type": "string"
+                      },
+                      "event": {
+                        "type": "string"
+                      },
+                      "cert_name": {
+                        "type": "string"
+                      },
+                      "grade": {
+                        "type": "string"
+                      },
+                      "start_date": {
+                        "type": "string"
+                      },
+                      "end_date": {
+                        "type": "string"
+                      },
+                      "issue_date": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["name"],
+                    "type": "object",
+                    "additionalProperties": false,
+                    "$schema": "http://cord.network/draft-01/schema#"
+                  },
+                  "credentialHash": "0x94da9471f6c0d70cf9808251584e29bde3a3b28db2020364faf6b327d14471f6",
+                  "id": "stmt:cord:s3cq28uBNQAgmFhgUwvyaHiRWSP9Uj78fP38h6B3AvMgPmSjV",
+                  "proof": [
+                    {
+                      "type": "Ed25519Signature2020",
+                      "created": "Sun Mar 16 2025 14:51:15 GMT+0000 (Coordinated Universal Time)",
+                      "proofPurpose": "sr25519",
+                      "verificationMethod": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX#0x06e60a6f16e588711cd60def38154097bbab382b5b93d9cdc15f2e1de2354e35",
+                      "proofValue": "z5inxrg9mAz3G2K6mSEyA638sNHfXLmq4BZW3vfbaBwUGrhfmvenHEoufcbqk3p4hmc4ENNP33N4GyzdhqBHP2kBr"
+                    },
+                    {
+                      "type": "CordProof2024",
+                      "elementUri": "stmt:cord:s3cq28uBNQAgmFhgUwvyaHiRWSP9Uj78fP38h6B3AvMgPmSjV:94da9471f6c0d70cf9808251584e29bde3a3b28db2020364faf6b327d14471f6",
+                      "spaceUri": "space:cord:c36BVtThSzuW4cuS5B2ddxu4Zvn6tFmvoX3hs4APXm3Me4x2m",
+                      "schemaUri": "schema:cord:s33JPd1FdhZfxDrTxWnabXKL5dq68o6Z6yENa8tJgh1ak8C3K",
+                      "creatorUri": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX",
+                      "digest": "0x94da9471f6c0d70cf9808251584e29bde3a3b28db2020364faf6b327d14471f6",
+                      "identifier": "stmt:cord:s3cq28uBNQAgmFhgUwvyaHiRWSP9Uj78fP38h6B3AvMgPmSjV",
+                      "genesisHash": "0x743115aca5f58453993db0b163772f35d086eafefe3b9bc30e304b76453e428a"
+                    },
+                    {
+                      "type": "CordSDRProof2024",
+                      "defaultDigest": "0x330aedf422be96960ab637c6acacaf5d72489986f078b73fe9e96e4847e0af93",
+                      "hashes": [
+                        "0x01a627b19768a36831dcdb55fc96ce7844269ce9f7664746c9e5e88ba51555f8",
+                        "0x0743539b68e94eb6dd15e58252013e421ead414dff31b09d586c45fff84eb724",
+                        "0x1746884df99569acff4e8948a845ae3697ba8ff1748de465a8790ca78ad275c9",
+                        "0x4c60469d0bb9a156c988bc0d76eb56f61e1a6b07e69aac235a5f1ec037262ee6",
+                        "0x4cc157c5579cc7e3e07f8323bb94c6b4fcfc7357a9fac5a4ceeb3abafe7529ce",
+                        "0x4fb6e331ab76127a8118253bfe1015b01060cf392415f165502e6492078f1406",
+                        "0x562dc6c2491a4f34a198e6611fc82d41ad78719253cc54ec7c9609359415f685",
+                        "0xa8b69558a1a94989b68dce2f82476f31d7d9f81c326c9dcfebf5fb4fc8db37bd",
+                        "0xdeeb6cade4a57a874efe962ae477b37884696fbb88553a4a07191d6465d64ff0",
+                        "0xe3b10e5075437a971361f7addb621e78c4a554793b7232193f8a5e59bfcc484b"
+                      ],
+                      "nonceMap": {
+                        "0xe7ebacf2deb37d791a115809ac8c61269b1ecefea7884f543547801d7a05ea96": "24e92a64-5c2f-4e9f-a52d-12016cf83276",
+                        "0x0b0afc2e72c987d308341a62013e195f5af7a145db93014314e7bef8c9c84924": "7f97ef9d-3b17-473b-bfd4-57bff36bd861",
+                        "0xfd54598f82a18e904feb131e70b609c2eec65468c5c51a1b2499b824409ab123": "afb9e11f-b7a5-4a51-89fd-12c0d8e4c521",
+                        "0x602f5d864e5ef32a7c89e55964b9aba0b4a69db57e6cd5d97b2176fbc7f98256": "fdd69401-e0fe-4959-b973-01038c134b57",
+                        "0xe2145b70e1046c775339f0744568b4b36c00305622f5933250f3a9ceb94c9297": "d3280138-ca5a-4bba-90e8-ca8e42e9ac7e",
+                        "0x582c488eddebdcb2cc340fe86e6e8991ac0cf38a1f314a83ce575cde43affdf7": "b6628176-7388-4ef7-9063-7e1f63cc680f",
+                        "0xc7a333b3dc0224a621e2f44469462641de17cfffec2e7849b197c2431236e12d": "6ee7b954-75cb-4de1-814a-0c978195a2d4",
+                        "0x5a4d3e118aabfe7d329a3c1def661ebb4148b9b2b34fc674471986ec8060b5a3": "926f84db-b3b6-4e74-91e1-a4c264346da6",
+                        "0x7f4627c424798fbd9de2a3a4eda2c84c4f638aae88e6915470bd434c0ade8adf": "2dc0a77f-4fbd-43d1-a904-e75086bbd8a4",
+                        "0x2543e748c24d638d220faf8a98a06304b3e0b47ceee940f9b061a2103315410c": "88515b19-3c12-4e8f-9918-e134adc61800"
+                      },
+                      "genesisHash": "0x743115aca5f58453993db0b163772f35d086eafefe3b9bc30e304b76453e428a"
+                    }
+                  ]
                 }
               }
             }
@@ -64,16 +163,12 @@
                   "properties": {
                     "error": {
                       "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
+                      "items": { "type": "string" },
                       "example": []
                     },
                     "warnings": {
                       "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
+                      "items": { "type": "string" },
                       "example": []
                     },
                     "checks": {
@@ -81,15 +176,9 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "isValid": {
-                            "type": "boolean"
-                          },
-                          "message": {
-                            "type": "string"
-                          },
-                          "type": {
-                            "type": "string"
-                          }
+                          "isValid": { "type": "boolean" },
+                          "message": { "type": "string" },
+                          "type": { "type": "string" }
                         }
                       },
                       "example": [
@@ -109,12 +198,8 @@
                       "description": "The original or modified credential object",
                       "additionalProperties": true,
                       "example": {
-                        "@context": [
-                          "https://www.w3.org/2018/credentials/v1"
-                        ],
-                        "type": [
-                          "VerifiableCredential"
-                        ],
+                        "@context": ["https://www.w3.org/2018/credentials/v1"],
+                        "type": ["VerifiableCredential"],
                         "issuer": "did:example:123",
                         "credentialSubject": {
                           "id": "did:example:456"
@@ -134,6 +219,7 @@
     },
     "/api/v1/verify/presentations/verify": {
       "post": {
+        "tags": ["Presentations"],
         "summary": "Verify a Verifiable Presentation",
         "description": "Verifies the given Verifiable Presentation (VP) and returns validation checks.",
         "requestBody": {
@@ -146,21 +232,93 @@
                 "additionalProperties": true,
                 "example": {
                   "@context": [
-                    "https://www.w3.org/2018/credentials/v1"
+                    "https://www.w3.org/2018/credentials/v1",
+                    "https://cord.network/2023/cred/v1"
                   ],
-                  "type": [
-                    "VerifiablePresentation"
-                  ],
-                  "verifiableCredential": [
+                  "type": ["VerifiablePresentation"],
+                  "holder": "did:cord:3wrF5oYj4QfCJfRY9FP3u71H4zoYdBUEXfCDuQhae3ygZcKj",
+                  "VerifiableCredential": [
                     {
-                      "issuer": "did:example:123",
+                      "@context": [
+                        "https://www.w3.org/2018/credentials/v1",
+                        "https://cord.network/2023/cred/v1"
+                      ],
+                      "type": ["VerifiableCredential"],
+                      "issuer": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX",
+                      "issuanceDate": "2025-03-16T11:55:06.207Z",
                       "credentialSubject": {
-                        "id": "did:example:456"
-                      }
+                        "id": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX",
+                        "@context": {
+                          "vocab": "schema:cord:s31JZMj5HgBrHcA2kjjtN9vcBZeN5QveHPs1B2LM32rsdw4Rh#"
+                        },
+                        "email": "rahul.chandra++test255@dhiway.com",
+                        "name": "rahul"
+                      },
+                      "validFrom": "2025-03-16T11:55:06.207Z",
+                      "validUntil": "2026-03-16T11:55:06.207Z",
+                      "metadata": {},
+                      "credentialSchema": {
+                        "$id": "schema:cord:s31JZMj5HgBrHcA2kjjtN9vcBZeN5QveHPs1B2LM32rsdw4Rh",
+                        "title": "wallet-otp-schema:f5116405-8b5b-4be0-8581-b99c11b5fc06:5e997929-8843-467b-8351-b8229fea9125",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [],
+                        "type": "object",
+                        "additionalProperties": false,
+                        "$schema": "http://cord.network/draft-01/schema#"
+                      },
+                      "credentialHash": "0x82bd3dfe1244abb6a70a926dc9bcfa1edbeeb36806a636810f7db9c1d9bf9317",
+                      "id": "stmt:cord:s3cEX6B1ktTqgNifg33st83xumWhNmTKHWqXaji41mS2FGPjj",
+                      "proof": [
+                        {
+                          "type": "Ed25519Signature2020",
+                          "created": "Sun Mar 16 2025 11:55:06 GMT+0000 (Coordinated Universal Time)",
+                          "proofPurpose": "sr25519",
+                          "verificationMethod": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX#0x06e60a6f16e588711cd60def38154097bbab382b5b93d9cdc15f2e1de2354e35",
+                          "proofValue": "z4VCMEPbu281yiciiZodANKHvmjEuSwudpj4k7k3qdc5nus4JziVkG1uTzzbV95ec7CcUBYQoDhqRD2rrfhCcJwPy"
+                        },
+                        {
+                          "type": "CordProof2024",
+                          "elementUri": "stmt:cord:s3cEX6B1ktTqgNifg33st83xumWhNmTKHWqXaji41mS2FGPjj:82bd3dfe1244abb6a70a926dc9bcfa1edbeeb36806a636810f7db9c1d9bf9317",
+                          "spaceUri": "space:cord:c36BVtThSzuW4cuS5B2ddxu4Zvn6tFmvoX3hs4APXm3Me4x2m",
+                          "schemaUri": "schema:cord:s31JZMj5HgBrHcA2kjjtN9vcBZeN5QveHPs1B2LM32rsdw4Rh",
+                          "creatorUri": "did:cord:3z2jGMtb91fA7QUXz518ab9q2MwRpU9cz5i4rpcQbLLkBhDX",
+                          "digest": "0x82bd3dfe1244abb6a70a926dc9bcfa1edbeeb36806a636810f7db9c1d9bf9317",
+                          "identifier": "stmt:cord:s3cEX6B1ktTqgNifg33st83xumWhNmTKHWqXaji41mS2FGPjj",
+                          "genesisHash": "0x743115aca5f58453993db0b163772f35d086eafefe3b9bc30e304b76453e428a"
+                        },
+                        {
+                          "type": "CordSDRProof2024",
+                          "defaultDigest": "0x6bbbb9c600e6dcf866dab2cc6076b7d19afc5f45d533cdada8798b91b49fe28b",
+                          "hashes": [
+                            "0xb4742986da68a0c944d0ce0ab505e725a6fa211ea2df60e0b1a0d926f64d25bb",
+                            "0xcabe2c289515884376d8356b90fca371d6a9f1c87ea4a53a8bc2ff7472154a48",
+                            "0xd673023fe1b532a24890449003f9777663631c9dd6bbb557f359f79eed9bc437"
+                          ],
+                          "nonceMap": {
+                            "0x758d221df845b76d18e163feb6f2eef2940acc81ca7d305178142ddf8c7ae2d1": "b609c5d4-ce11-4860-8733-735094212129",
+                            "0xa5bba85582fe3688edd5ecc2cdea71a2475af6c93f48db54c98cf4dfd4d8b787": "56896650-a438-496e-ab63-1426284e0888",
+                            "0x7866e39aafa1ac48f20ddbf02e3968e68ccebb78b491b95e609e6f58cf612d95": "66f4225b-5ad9-4efe-916b-07adb449b5dc"
+                          },
+                          "genesisHash": "0x743115aca5f58453993db0b163772f35d086eafefe3b9bc30e304b76453e428a"
+                        }
+                      ]
                     }
                   ],
+                  "metadata": {},
                   "proof": {
-                    "type": "CordPresentationProof2024"
+                    "challenge": "7b69948b-86df-48a4-812c-28e543493986",
+                    "type": "Ed25519Signature2020",
+                    "created": "Sun Mar 16 2025 11:55:09 GMT+0000 (Coordinated Universal Time)",
+                    "proofPurpose": "ed25519",
+                    "verificationMethod": "did:cord:3wrF5oYj4QfCJfRY9FP3u71H4zoYdBUEXfCDuQhae3ygZcKj#0xb74bb8bdf198aaaadd625102c181778d2aea8ac504375c8543691512d8496aee",
+                    "proofValue": "zBLRRtVpGJRH8CFvBVjJnAs1sEwZaFUm5buo3qAokaBQp7pk3j2h784DByksWyCMs46a74ZBE5MHtNhey3d9Byh1"
                   }
                 }
               }
@@ -177,16 +335,12 @@
                   "properties": {
                     "error": {
                       "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
+                      "items": { "type": "string" },
                       "example": []
                     },
                     "warnings": {
                       "type": "array",
-                      "items": {
-                        "type": "string"
-                      },
+                      "items": { "type": "string" },
                       "example": []
                     },
                     "checks": {
@@ -194,15 +348,9 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "isValid": {
-                            "type": "boolean"
-                          },
-                          "message": {
-                            "type": "string"
-                          },
-                          "type": {
-                            "type": "string"
-                          }
+                          "isValid": { "type": "boolean" },
+                          "message": { "type": "string" },
+                          "type": { "type": "string" }
                         }
                       },
                       "example": [
@@ -233,9 +381,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
-                      "type": "string"
-                    }
+                    "error": { "type": "string" }
                   },
                   "example": {
                     "error": "Invalid presentation format"
@@ -247,8 +393,9 @@
         }
       }
     },
-    "/document/verify": {
+    "/api/v1/document/verify": {
       "post": {
+        "tags": ["Document"],
         "summary": "Verify a document by hash",
         "description": "Verifies a document using its file hash and returns the block height.",
         "requestBody": {
@@ -257,9 +404,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "filehash"
-                ],
+                "required": ["filehash"],
                 "properties": {
                   "filehash": {
                     "type": "string",
