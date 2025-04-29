@@ -26,6 +26,11 @@
       "get": {
         "summary": "DigiLocker Request",
         "description": "Initiates a DigiLocker request and returns an authorization URL",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response containing redirect URL",
@@ -55,6 +60,11 @@
       "post": {
         "summary": "DigiLocker Auth",
         "description": "Authenticates using DigiLocker code and document type (aadhaar or pan) and returns a Verifiable Credential",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -121,5 +131,19 @@
         }
       }
     }
-  }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ]
 }
