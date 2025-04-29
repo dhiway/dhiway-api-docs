@@ -1,0 +1,125 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "Issuer Agent Digilocker",
+    "description": "API documentation for Issuer Agent DigiLocker",
+    "termsOfService": "http://studio.dhiway.com/page/terms-and-conditions",
+    "contact": {
+      "name": "Dhiway Networks",
+      "email": "info@dhiway.com",
+      "url": "https://dhiway.com"
+    },
+    "license": {
+      "name": "Apache v2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://agent.dev.demo.dhiway.com",
+      "description": "Demo server"
+    }
+  ],
+  "paths": {
+    "/api/v1/discover/digilocker-request": {
+      "get": {
+        "summary": "DigiLocker Request",
+        "description": "Initiates a DigiLocker request and returns an authorization URL",
+        "responses": {
+          "200": {
+            "description": "Successful response containing redirect URL",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "example": "https://api.digitallocker.gov.in/public/oauth2/1/authorize?response_type=code&grant_type=authorization_code&client_id=1EEE5070&redirect_uri=https://studiodemo.dhiway.com/wallet-redirect&state=U2F0IEp1biAxMCAyMDIzIDIxOjIwOjMyIEdNVCswNTMwIChJbmRpYSBTdGFuZGFyZCBUaW1lKQ%3D%3D"
+                    }
+                  },
+                  "required": ["url"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/api/v1/discover/digilocker-auth": {
+      "post": {
+        "summary": "DigiLocker Auth",
+        "description": "Authenticates using DigiLocker code and document type (aadhaar or pan) and returns a Verifiable Credential",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "example": "example-auth-code"
+                  },
+                  "doctype": {
+                    "type": "string",
+                    "enum": ["aadhaar", "pan"],
+                    "example": "aadhaar"
+                  }
+                },
+                "required": ["code", "doctype"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verifiable Credential issued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Verifiable Credential in JSON format",
+                      "example": {
+                        "@context": [
+                          "https://www.w3.org/2018/credentials/v1"
+                        ],
+                        "type": [
+                          "VerifiableCredential",
+                          "AadhaarCard"
+                        ],
+                        "credentialSubject": {
+                          "id": "did:example:123",
+                          "name": "John Doe",
+                          "aadhaarNumber": "XXXX-XXXX-1234"
+                        },
+                        "issuer": "did:dhiway:issuer",
+                        "issuanceDate": "2025-04-29T12:00:00Z"
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Aadhaar issued successfully"
+                    }
+                  },
+                  "required": ["data", "message"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        }
+      }
+    }
+  }
+}
