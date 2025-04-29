@@ -1,0 +1,311 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.4.1",
+    "title": "Verification Middleware",
+    "description": "API for verifying Verifiable Presentations, Verifiable Credentials, Doc hash",
+    "termsOfService": "http://studio.dhiway.com/page/terms-and-conditions",
+    "contact": {
+      "name": "Dhiway Networks",
+      "email": "info@dhiway.com",
+      "url": "https://dhiway.com"
+    },
+    "license": {
+      "name": "Apache v2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.cord.network",
+      "description": "Demo server"
+    }
+  ],
+  "paths": {
+    "/api/v1/verify/credentials/verify": {
+      "post": {
+        "summary": "Verify a Verifiable Credential",
+        "description": "Verifies the given Verifiable Credential (VC) and returns validation checks.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Verifiable Credential object",
+                "additionalProperties": true,
+                "example": {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1"
+                  ],
+                  "type": [
+                    "VerifiableCredential"
+                  ],
+                  "issuer": "did:example:123",
+                  "credentialSubject": {
+                    "id": "did:example:456"
+                  },
+                  "proof": {
+                    "type": "CordProof2024",
+                    "created": "2024-01-01T00:00:00Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": []
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": []
+                    },
+                    "checks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "isValid": {
+                            "type": "boolean"
+                          },
+                          "message": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "example": [
+                        {
+                          "isValid": true,
+                          "message": "Digest properties provided are valid and matches the statement details.",
+                          "type": "CordProof2024"
+                        },
+                        {
+                          "isValid": true,
+                          "type": "CordSDRProof2024"
+                        }
+                      ]
+                    },
+                    "credential": {
+                      "type": "object",
+                      "description": "The original or modified credential object",
+                      "additionalProperties": true,
+                      "example": {
+                        "@context": [
+                          "https://www.w3.org/2018/credentials/v1"
+                        ],
+                        "type": [
+                          "VerifiableCredential"
+                        ],
+                        "issuer": "did:example:123",
+                        "credentialSubject": {
+                          "id": "did:example:456"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid input! Not a valid Verifiable Credential"
+          }
+        }
+      }
+    },
+    "/api/v1/verify/presentations/verify": {
+      "post": {
+        "summary": "Verify a Verifiable Presentation",
+        "description": "Verifies the given Verifiable Presentation (VP) and returns validation checks.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Verifiable Presentation object",
+                "additionalProperties": true,
+                "example": {
+                  "@context": [
+                    "https://www.w3.org/2018/credentials/v1"
+                  ],
+                  "type": [
+                    "VerifiablePresentation"
+                  ],
+                  "verifiableCredential": [
+                    {
+                      "issuer": "did:example:123",
+                      "credentialSubject": {
+                        "id": "did:example:456"
+                      }
+                    }
+                  ],
+                  "proof": {
+                    "type": "CordPresentationProof2024"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Presentation verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": []
+                    },
+                    "warnings": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": []
+                    },
+                    "checks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "isValid": {
+                            "type": "boolean"
+                          },
+                          "message": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "example": [
+                        {
+                          "isValid": true,
+                          "message": "Digest properties provided are valid and matches the statement details.",
+                          "type": "CordProof2024"
+                        },
+                        {
+                          "isValid": true,
+                          "type": "CordSDRProof2024"
+                        }
+                      ]
+                    },
+                    "presentation": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid presentation format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "error": "Invalid presentation format"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/document/verify": {
+      "post": {
+        "summary": "Verify a document by hash",
+        "description": "Verifies a document using its file hash and returns the block height.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "filehash"
+                ],
+                "properties": {
+                  "filehash": {
+                    "type": "string",
+                    "description": "SHA-256 hash of the document"
+                  }
+                },
+                "example": {
+                  "filehash": "ab34f89c9d41e33484b7e173213cc88efdbf23bc67833a9007c65d27d9e8e777"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "blockHash": {
+                          "type": "integer",
+                          "description": "Block height from the blockchain",
+                          "example": 123456
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "result": {
+                      "blockHash": 123456
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid hash format or verification failed"
+          }
+        }
+      }
+    }
+  }
+}
