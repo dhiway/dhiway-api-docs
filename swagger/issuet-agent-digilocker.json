@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "version": "1.0.0",
-    "title": "IssuerAgentDigilocker",
+    "title": "Issuer Agent Digilocker",
     "description": "API documentation for Issuer Agent DigiLocker",
     "termsOfService": "http://studio.dhiway.com/page/terms-and-conditions",
     "contact": {
