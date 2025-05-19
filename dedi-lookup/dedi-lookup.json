@@ -15,8 +15,16 @@
   },
   "servers": [
     {
-      "url": "https://demo.lookup.dedi.global",
-      "description": "Demo"
+      "url": "https://sandbox.dedi.global",
+      "description": "Sandbox"
+    },
+    {
+      "url": "https://beta.dedi.global",
+      "description": "Beta"
+    },
+    {
+      "url": "https://dev.dedi.global",
+      "description": "Dev"
     },
     {
       "url": "http://localhost:5106",
@@ -652,7 +660,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NamepsaceVersionLookup"
+                  "$ref": "#/components/schemas/NamespaceVersionLookup"
                 }
               }
             }
@@ -668,7 +676,98 @@
             }
           },
           "404": {
-            "description": "Namepsace Not found",
+            "description": "Namespace Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Locked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "451": {
+            "description": "Not available for legal reasons",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "Method not implemented",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/versions/{namespace}/{registry_name}": {
+      "get": {
+        "tags": [
+          "Version API"
+        ],
+        "description": "Get all versions of a specific registry",
+        "operationId": "getRegistryVersions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Namespace ID or verified domain"
+          },
+          {
+            "in": "path",
+            "name": "registry_name",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Name of the registry"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with version information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryVersionLookup"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Namespace Not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1108,17 +1207,17 @@
           "created_by"
         ]
       },
-      "NamepsaceVersionLookup": {
+      "NamespaceVersionLookup": {
         "type": "object",
-        "description": "Record version information",
+        "description": "Namespace version information",
         "properties": {
           "namespace_id": {
             "type": "string",
-            "description": "Unique record identifier"
+            "description": "Unique namespace identifier"
           },
           "name": {
             "type": "string",
-            "description": "Record name"
+            "description": "Namespace name"
           },
           "total_versions": {
             "type": "integer",
@@ -1129,7 +1228,38 @@
             "type": "array",
             "description": "List of all versions",
             "items": {
-              "type": "array",
+              "type": "string",
+              "default": "e3b0c44298fc1c149afbae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      },
+      "RegistryVersionLookup": {
+        "type": "object",
+        "description": "Registry version information",
+        "properties": {
+          "namespace_id": {
+            "type": "string",
+            "description": "Unique namespace identifier"
+          },
+          "registry_id": {
+            "type": "string",
+            "description": "Unique registry identifier"
+          },
+          "registry_name": {
+            "type": "string",
+            "description": "Unique registry name"
+          },
+          "total_versions": {
+            "type": "integer",
+            "description": "Total number of versions",
+            "default": 1
+          },
+          "versions": {
+            "type": "array",
+            "description": "List of all versions",
+            "items": {
+              "type": "string",
               "default": "e3b0c44298fc1c149afbae41e4649b934ca495991b7852b855"
             }
           }
@@ -1156,7 +1286,7 @@
             "type": "array",
             "description": "List of all versions",
             "items": {
-              "type": "array",
+              "type": "string",
               "default": "e3b0c44298fc1c149afbae41e4649b934ca495991b7852b855"
             }
           }

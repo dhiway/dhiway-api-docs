@@ -15,8 +15,16 @@
   },
   "servers": [
     {
-      "url": "https://demo.lookup.dedi.global",
-      "description": "Demo"
+      "url": "https://sandbox.dedi.global",
+      "description": "Sandbox"
+    },
+    {
+      "url": "https://beta.dedi.global",
+      "description": "Beta"
+    },
+    {
+      "url": "https://dev.dedi.global",
+      "description": "Dev"
     },
     {
       "url": "http://localhost:5106",
@@ -466,7 +474,7 @@
         },
         "responses": {
           "201": {
-            "description": "Created",
+            "description": "created",
             "content": {
               "text/plain": {
                 "schema": {
@@ -479,6 +487,191 @@
         }
       }
     },
+    "/dedi/{namespace}/{registry_name}/add-delegate": {
+      "post": {
+        "tags": [
+          "Delegation"
+        ],
+        "summary": "Add a new delegate to a registry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "permission": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Delegate added successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Delegate added successfully"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/generate-dns-txt/{namespace}/{domain}": {
+      "get": {
+        "tags": [
+          "Domain verification"
+        ],
+        "summary": "Generate txt",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Generated domain's DNS TXT record",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Generated domain's DNS TXT record"
+              }
+            }
+          }
+        }
+      }
+    },  
+    "/dedi/verify-domain": {
+      "post": {
+        "tags": [
+          "Domain verification"
+        ],
+        "summary": "Add a new delegate to a registry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "namespace_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification Successful",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Verification Successful"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/check-verification/{namespace}": {
+      "get": {
+        "tags": [
+          "Domain verification"
+        ],
+        "summary": "Check verification status",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Generated domain's DNS TXT record",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Generated domain's DNS TXT record"
+              }
+            }
+          }
+        }
+      }
+    }, 
     "/dedi/{namespace}/update-namepsace": {
       "post": {
         "tags": [
@@ -539,6 +732,74 @@
         }
       }
     },
+    "/dedi/{namespace}/{registry_name}/update-registry": {
+      "post": {
+        "tags": [
+          "Update"
+        ],
+        "summary": "Update an existing registry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "new_registry_name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "meta": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Updated",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Registry updated"
+              }
+            }
+          }
+        }
+      }
+    },
     "/dedi/{namespace}/{registry_name}/{record_name}/update-record": {
       "post": {
         "tags": [
@@ -583,10 +844,19 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "new_record_name": {
+                    "type": "string"
+                  },
                   "description": {
                     "type": "string"
                   },
                   "details": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "meta": {
                     "type": "object",
                     "additionalProperties": {
                       "type": "string"
@@ -606,6 +876,182 @@
                   "type": "string"
                 },
                 "example": "updated"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/revoke-registry": {
+      "post": {
+        "tags": [
+          "State management"
+        ],
+        "summary": "Revoke a registry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registry revoked",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Registry revoked"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/reinstate-registry": {
+      "post": {
+        "tags": [
+          "State management"
+        ],
+        "summary": "Reinstate a registry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registry reinstated",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Registry reinstated"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/archive-registry": {
+      "post": {
+        "tags": [
+          "State management"
+        ],
+        "summary": "Archive a registry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registry archived",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Registry archived"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/restore-registry": {
+      "post": {
+        "tags": [
+          "State management"
+        ],
+        "summary": "Restore a registry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registry restored",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "Registry restored"
               }
             }
           }
