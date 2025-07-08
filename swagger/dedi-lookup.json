@@ -34,53 +34,15 @@
   "paths": {
     "/dedi/lookup/{namespace}": {
       "get": {
-        "tags": [
-          "Lookup API"
-        ],
-        "description": "Get the latest details of the namespace. Namespace can be either the unique ID or verified domain of the entity.",
+        "tags": ["Lookup API"],
+        "summary": "Get namespace details",
+        "description": "Fetches the latest or specific version details of a namespace. Namespace can be the unique ID or a verified domain. Requires access token.",
         "operationId": "getNamespaceDetails",
-        "parameters": [
+        "security": [
           {
-            "in": "path",
-            "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Namespace reference - Unique ID of the namespace or verified domain"
+            "bearerAuth": []
           }
         ],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NamespaceLookup"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Namespace Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/lookup/{namespace}/{registry_name}": {
-      "get": {
-        "tags": [
-          "Lookup API"
-        ],
-        "description": "Get the latest details of the registry within a namespace",
-        "operationId": "getRegistryDetails",
         "parameters": [
           {
             "in": "path",
@@ -92,70 +54,338 @@
             "description": "Namespace reference - Unique ID or verified domain"
           },
           {
-            "in": "path",
-            "name": "registry_name",
+            "in": "query",
+            "name": "version_id",
             "schema": {
               "type": "string"
             },
-            "required": true,
-            "description": "Name of the registry (unique within the namespace)"
-          },
-          {
-            "name": "version",
-            "in": "query",
-            "description": "Version of the registry. Default is null (returns latest version)",
-            "schema": {
-              "type": "string"
-            }
+            "required": false,
+            "description": "Optional version ID to fetch a specific version of the namespace"
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Namespace details retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistryLookup"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Namespace details retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string" },
+                        "namespace_id": { "type": "string" },
+                        "digest": { "type": "string" },
+                        "description": { "type": "string" },
+                        "created_by": { "type": "string" },
+                        "genesis": { "type": "string" },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "version_count": { "type": "string" },
+                        "version": { "type": "string" },
+                        "meta": { "type": "object" },
+                        "registry_count": { "type": "string" },
+                        "ttl": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input: namespace is missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: namespace is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Unauthorized - Missing or invalid token",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
                 }
               }
             }
           },
           "404": {
-            "description": "Registry Not found",
+            "description": "Namespace not found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "namespace not found"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "example": "Error stack/message here"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/lookup/{namespace}/{registry_name}": {
+      "get": {
+        "tags": ["Lookup API"],
+        "summary": "Get registry details",
+        "description": "Fetches the latest or specific version details of a registry within a namespace. Requires access token.",
+        "operationId": "getRegistryDetails",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "description": "Namespace reference - Unique ID or verified domain",
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "path",
+            "name": "registry_name",
+            "required": true,
+            "description": "Name of the registry (unique within the namespace)",
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "query",
+            "name": "version_id",
+            "required": false,
+            "description": "Version of the registry. If not provided, the latest version is returned.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registry details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Resource retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "namespace": { "type": "string" },
+                        "namespace_id": { "type": "string" },
+                        "registry_id": { "type": "string" },
+                        "registry_name": { "type": "string" },
+                        "digest": { "type": "string" },
+                        "description": { "type": "string" },
+                        "created_by": { "type": "string" },
+                        "schema": { "type": "object" },
+                        "genesis": { "type": "string" },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "meta": { "type": "object" },
+                        "record_count": { "type": "string" },
+                        "version_count": { "type": "string" },
+                        "version": { "type": "string" },
+                        "query_allowed": { "type": "string" },
+                        "is_revoked": { "type": "boolean" },
+                        "is_archived": { "type": "boolean" },
+                        "ttl": { "type": "integer", "example": 600 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request due to missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: namespace is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Namespace or Registry not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry not found"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
                 }
               }
             }
           },
           "423": {
-            "description": "Locked",
+            "description": "Registry is locked",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry is locked"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
                 }
               }
             }
           },
           "451": {
-            "description": "Unavailable for legal reasons",
+            "description": "Registry is unavailable for legal reasons",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry is unavailable for legal reasons"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": { "type": "string", "example": "error.message" }
+                  }
                 }
               }
             }
@@ -165,95 +395,208 @@
     },
     "/dedi/lookup/{namespace}/{registry_name}/{record_name}": {
       "get": {
-        "tags": [
-          "Lookup API"
-        ],
-        "description": "Get the details of a specific record within a registry",
+        "tags": ["Lookup API"],
+        "summary": "Get record details",
+        "description": "Fetches the latest or specific version of a record within a registry. Requires access token.",
         "operationId": "getRecordDetails",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
             "required": true,
-            "description": "Namespace ID or verified domain"
+            "description": "Namespace ID or verified domain",
+            "schema": { "type": "string" }
           },
           {
             "in": "path",
             "name": "registry_name",
-            "schema": {
-              "type": "string"
-            },
             "required": true,
-            "description": "Name of the registry (unique within the namespace)"
+            "description": "Name of the registry (unique within the namespace)",
+            "schema": { "type": "string" }
           },
           {
             "in": "path",
             "name": "record_name",
-            "schema": {
-              "type": "string"
-            },
             "required": true,
-            "description": "Name of the record (unique within the registry)"
+            "description": "Name of the record (unique within the registry)",
+            "schema": { "type": "string" }
           },
           {
-            "name": "version",
             "in": "query",
-            "description": "Version of the record. Default is null (returns latest version)",
-            "schema": {
-              "type": "string"
-            }
+            "name": "version_id",
+            "required": false,
+            "description": "Version of the record. Returns latest if not provided.",
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
           "200": {
-            "description": "Record Found",
+            "description": "Record found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RecordLookup"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Resource retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "namespace": { "type": "string" },
+                        "namespace_id": { "type": "string" },
+                        "registry_id": { "type": "string" },
+                        "registry_name": { "type": "string" },
+                        "record_id": { "type": "string" },
+                        "record_name": { "type": "string" },
+                        "description": { "type": "string" },
+                        "digest": { "type": "string" },
+                        "schema": { "type": "object" },
+                        "version_count": { "type": "string" },
+                        "version": { "type": "string" },
+                        "details": { "type": "object" },
+                        "meta": { "type": "object" },
+                        "genesis": { "type": "string" },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "created_by": { "type": "string" },
+                        "is_revoked": { "type": "boolean" },
+                        "is_archived": { "type": "boolean" },
+                        "ttl": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid path input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: record_name is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Unauthorized - Missing or invalid token",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
                 }
               }
             }
           },
           "404": {
-            "description": "Record Not found",
+            "description": "Record/Registry/Namespace not found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "record not found"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
                 }
               }
             }
           },
           "423": {
-            "description": "Locked",
+            "description": "Record is locked",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Record is locked"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
                 }
               }
             }
           },
           "451": {
-            "description": "Not available for legal reasons",
+            "description": "Record is unavailable for legal reasons",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Record is unavailable for legal reasons"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": { "type": "string", "example": "error.message" }
+                  }
                 }
               }
             }
@@ -263,95 +606,131 @@
     },
     "/dedi/query/{namespace}": {
       "get": {
-        "tags": [
-          "Query API"
-        ],
-        "description": "Get all registries within the specified namespace",
+        "tags": ["Query API"],
+        "summary": "Query registries in a namespace",
+        "description": "Get all registries within the specified namespace using filters and pagination. Requires access token.",
         "operationId": "queryNamespace",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
             "required": true,
-            "description": "Namespace ID or verified domain"
+            "description": "Namespace ID or verified domain",
+            "schema": { "type": "string" }
           },
           {
+            "in": "query",
             "name": "from",
-            "in": "query",
-            "description": "Filter by creation date (from). Default is registry creation date",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
+            "description": "Filter by creation date (from)",
+            "schema": { "type": "string", "format": "date" }
           },
           {
+            "in": "query",
             "name": "to",
-            "in": "query",
-            "description": "Filter by creation date (to). Default is current date",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
+            "description": "Filter by creation date (to)",
+            "schema": { "type": "string", "format": "date" }
           },
           {
+            "in": "query",
             "name": "status",
-            "in": "query",
-            "description": "Filter by registry status",
-            "schema": {
-              "type": "string"
-            }
+            "description": "Filter by registry status (revoked, active)",
+            "schema": { "type": "string" }
           },
           {
+            "in": "query",
             "name": "name",
-            "in": "query",
-            "description": "Filter by registry name (minimum 3 characters)",
-            "schema": {
-              "type": "string"
-            }
+            "description": "Filter by registry name or schema text (min 3 characters)",
+            "schema": { "type": "string" }
           },
           {
-            "name": "sort",
             "in": "query",
+            "name": "sort",
             "description": "Sort results by field (ascending)",
             "schema": {
               "type": "string",
-              "enum": [
-                "date",
-                "status",
-                "name",
-                "id"
-              ]
+              "enum": ["date", "status", "name", "id"]
             }
           },
           {
+            "in": "query",
             "name": "page",
-            "in": "query",
-            "description": "Pagination offset (default: 0)",
-            "schema": {
-              "type": "integer",
-              "default": 0
-            }
+            "description": "Page number (starts from 1)",
+            "schema": { "type": "integer", "default": 1 }
           },
           {
-            "name": "page_size",
             "in": "query",
-            "description": "Number of items per page (default: 100)",
-            "schema": {
-              "type": "integer",
-              "default": 100
-            }
+            "name": "page_size",
+            "description": "Number of items per page",
+            "schema": { "type": "integer", "default": 10 }
           }
         ],
         "responses": {
           "200": {
-            "description": "Registries found in namespace",
+            "description": "Registries found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NamespaceQuery"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Resource retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "namespace_id": { "type": "string" },
+                        "namespace_name": { "type": "string" },
+                        "created_by": { "type": "string" },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "total_registries": { "type": "integer" },
+                        "page_number": { "type": "integer" },
+                        "page_size": { "type": "integer" },
+                        "registries": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "registry_id": { "type": "string" },
+                              "registry_name": { "type": "string" },
+                              "digest": { "type": "string" },
+                              "description": { "type": "string" },
+                              "created_by": { "type": "string" },
+                              "schema": { "type": "object" },
+                              "meta": { "type": "object" },
+                              "version": { "type": "string" },
+                              "version_count": { "type": "string" },
+                              "record_count": { "type": "string" },
+                              "is_revoked": { "type": "boolean" },
+                              "is_archived": { "type": "boolean" },
+                              "genesis": { "type": "string" },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "ttl": { "type": "integer", "example": 600 }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -368,11 +747,18 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad request (missing namespace or bad filters)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: namespace is missing"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
@@ -382,7 +768,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
@@ -392,37 +782,65 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Payment required to access resource"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
           },
           "404": {
-            "description": "Namespace Not found",
+            "description": "Namespace not found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "namespace not found"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
           },
           "423": {
-            "description": "Locked",
+            "description": "Namespace locked",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Namespace is locked"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
           },
           "451": {
-            "description": "Not available for legal reasons",
+            "description": "Unavailable for legal reasons",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unavailable for legal reasons"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
@@ -432,7 +850,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Not implemented"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error occurred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": { "type": "string", "example": "error.message" }
+                  }
                 }
               }
             }
@@ -442,112 +884,148 @@
     },
     "/dedi/query/{namespace}/{registry_name}": {
       "get": {
-        "tags": [
-          "Query API"
-        ],
-        "description": "Get all records within the specified registry",
+        "tags": ["Query API"],
+        "summary": "Query records in a registry",
+        "description": "Get all records within the specified registry using filters and pagination. Requires access token.",
         "operationId": "queryRegistry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "namespace",
-            "schema": {
-              "type": "string"
-            },
             "required": true,
-            "description": "Namespace ID or verified domain"
+            "description": "Namespace ID or verified domain",
+            "schema": { "type": "string" }
           },
           {
             "in": "path",
             "name": "registry_name",
-            "schema": {
-              "type": "string"
-            },
             "required": true,
-            "description": "Name of the registry"
+            "description": "Name of the registry",
+            "schema": { "type": "string" }
           },
           {
+            "in": "query",
             "name": "version",
-            "in": "query",
-            "description": "Version of the registry. Default is null (returns latest version)",
-            "schema": {
-              "type": "string"
-            }
+            "description": "Version of the registry (optional, returns latest if not provided)",
+            "schema": { "type": "string" }
           },
           {
+            "in": "query",
             "name": "from",
-            "in": "query",
-            "description": "Filter by creation date (from). Default is record creation date",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
+            "description": "Filter by record creation date (from)",
+            "schema": { "type": "string", "format": "date" }
           },
           {
+            "in": "query",
             "name": "to",
-            "in": "query",
-            "description": "Filter by creation date (to). Default is current date",
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
+            "description": "Filter by record creation date (to)",
+            "schema": { "type": "string", "format": "date" }
           },
           {
+            "in": "query",
             "name": "status",
-            "in": "query",
-            "description": "Filter by record status",
-            "schema": {
-              "type": "string"
-            }
+            "description": "Filter by record status (`active`, `revoked`)",
+            "schema": { "type": "string" }
           },
           {
+            "in": "query",
             "name": "name",
-            "in": "query",
-            "description": "Filter by record name (minimum 3 characters)",
-            "schema": {
-              "type": "string"
-            }
+            "description": "Filter by record name or details (min 3 characters)",
+            "schema": { "type": "string" }
           },
           {
-            "name": "sort",
             "in": "query",
-            "description": "Sort results by field (ascending)",
+            "name": "sort",
+            "description": "Sort by `date`, `status`, `name`, or `id` (ascending)",
             "schema": {
               "type": "string",
-              "enum": [
-                "date",
-                "status",
-                "name",
-                "id"
-              ]
+              "enum": ["date", "status", "name", "id"]
             }
           },
           {
+            "in": "query",
             "name": "page",
-            "in": "query",
-            "description": "Pagination offset (default: 0)",
-            "schema": {
-              "type": "integer",
-              "default": 0
-            }
+            "description": "Page number (starts from 1)",
+            "schema": { "type": "integer", "default": 1 }
           },
           {
-            "name": "page_size",
             "in": "query",
-            "description": "Number of items per page (default: 100)",
-            "schema": {
-              "type": "integer",
-              "default": 100
-            }
+            "name": "page_size",
+            "description": "Number of items per page",
+            "schema": { "type": "integer", "default": 10 }
           }
         ],
         "responses": {
           "200": {
-            "description": "Records found in registry",
+            "description": "Records found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RegistryQuery"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Resource retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "namespace_id": { "type": "string" },
+                        "namespace_name": { "type": "string" },
+                        "registry_id": { "type": "string" },
+                        "registry_name": { "type": "string" },
+                        "created_by": { "type": "string" },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "schema": { "type": "object" },
+                        "meta": { "type": "object" },
+                        "total_records": { "type": "integer" },
+                        "total_pages": { "type": "integer" },
+                        "page_number": { "type": "integer" },
+                        "page_size": { "type": "integer" },
+                        "records": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "record_id": { "type": "string" },
+                              "record_name": { "type": "string" },
+                              "description": { "type": "string" },
+                              "digest": { "type": "string" },
+                              "details": { "type": "object" },
+                              "meta": { "type": "object" },
+                              "version": { "type": "string" },
+                              "version_count": { "type": "string" },
+                              "created_by": { "type": "string" },
+                              "genesis": { "type": "string" },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "is_revoked": { "type": "boolean" },
+                              "is_archived": { "type": "boolean" }
+                            }
+                          }
+                        },
+                        "ttl": { "type": "integer", "example": 600 }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -568,7 +1046,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
@@ -578,7 +1060,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
@@ -588,17 +1074,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Payment required"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
           },
           "404": {
-            "description": "Registry Not found",
+            "description": "Registry or namespace not found",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry not found or not active"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
@@ -608,7 +1108,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Locked" },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
@@ -618,7 +1122,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unavailable for legal reasons"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
                 }
               }
             }
@@ -628,7 +1139,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Not implemented"
+                    },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error occurred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": { "type": "string", "example": "error.message" }
+                  }
                 }
               }
             }
@@ -638,29 +1173,52 @@
     },
     "/dedi/versions/{namespace}": {
       "get": {
-        "tags": [
-          "Version API"
-        ],
-        "description": "Get all versions of a specific namespace",
+        "tags": ["Version API"],
+        "summary": "Get all versions of a specific namespace",
+        "description": "Returns all available versions of a namespace. Requires access token.",
         "operationId": "getNamespaceVersions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "namespace",
+            "required": true,
+            "description": "Namespace ID or verified domain",
             "schema": {
               "type": "string"
-            },
-            "required": true,
-            "description": "Namespace ID or verified domain"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response with version information",
+            "description": "Namespace version list retrieved successfully",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NamespaceVersionLookup"
+                "example": {
+                  "message": "Resource retrieved successfully",
+                  "data": {
+                    "created_by": "example@example.com",
+                    "created_at": "2024-01-01T00:00:00.000Z",
+                    "updated_at": "2024-07-08T10:00:00.000Z",
+                    "total_versions": 1,
+                    "versions": ["string"],
+                    "ttl": 600
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input: namespace is missing",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid input: namespace is missing",
+                  "data": null
                 }
               }
             }
@@ -669,48 +1227,31 @@
             "description": "Unauthorized",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                "example": {
+                  "message": "Unauthorized",
+                  "data": null
                 }
               }
             }
           },
           "404": {
-            "description": "Namespace Not found",
+            "description": "Namespace not found",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                "example": {
+                  "message": "namespace not found",
+                  "data": null
                 }
               }
             }
           },
-          "423": {
-            "description": "Locked",
+          "500": {
+            "description": "Unexpected error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "451": {
-            "description": "Not available for legal reasons",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "501": {
-            "description": "Method not implemented",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                "example": {
+                  "message": "An unexpected error occurred",
+                  "data": "Some error message"
                 }
               }
             }
@@ -720,38 +1261,89 @@
     },
     "/dedi/versions/{namespace}/{registry_name}": {
       "get": {
-        "tags": [
-          "Version API"
-        ],
-        "description": "Get all versions of a specific registry",
+        "tags": ["Version API"],
+        "summary": "Get all versions of a specific registry",
+        "description": "Returns all available versions of a registry within the namespace. Requires access token.",
         "operationId": "getRegistryVersions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "namespace",
+            "required": true,
+            "description": "Namespace ID or verified domain",
             "schema": {
               "type": "string"
-            },
-            "required": true,
-            "description": "Namespace ID or verified domain"
+            }
           },
           {
             "in": "path",
             "name": "registry_name",
+            "required": true,
+            "description": "Name of the registry",
             "schema": {
               "type": "string"
-            },
-            "required": true,
-            "description": "Name of the registry"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response with version information",
+            "description": "Registry version list retrieved successfully",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RegistryVersionLookup"
+                "example": {
+                  "message": "Resource retrieved successfully",
+                  "data": {
+                    "registry_name": "example-registry",
+                    "created_by": "admin@example.com",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string" },
+                        "age": { "type": "number" }
+                      }
+                    },
+                    "created_at": "2024-01-01T00:00:00.000Z",
+                    "updated_at": "2024-07-08T12:34:56.000Z",
+                    "total_versions": 1,
+                    "versions": ["string"],
+                    "ttl": 600
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or missing parameters",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missing_namespace": {
+                    "value": {
+                      "message": "Invalid input: namespace is missing",
+                      "data": null
+                    }
+                  },
+                  "missing_registry": {
+                    "value": {
+                      "message": "Invalid input: registry_name is missing",
+                      "data": null
+                    }
+                  },
+                  "namespace_not_found": {
+                    "value": {
+                      "message": "namespace not found"
+                    }
+                  },
+                  "registry_not_found": {
+                    "value": {
+                      "message": "registry not found"
+                    }
+                  }
                 }
               }
             }
@@ -760,48 +1352,20 @@
             "description": "Unauthorized",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                "example": {
+                  "message": "Unauthorized",
+                  "data": null
                 }
               }
             }
           },
-          "404": {
-            "description": "Namespace Not found",
+          "500": {
+            "description": "Unexpected server error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "423": {
-            "description": "Locked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "451": {
-            "description": "Not available for legal reasons",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "501": {
-            "description": "Method not implemented",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                "example": {
+                  "message": "An unexpected error occurred",
+                  "data": "Some error message"
                 }
               }
             }
@@ -809,49 +1373,111 @@
         }
       }
     },
+
     "/dedi/versions/{namespace}/{registry_name}/{record_name}": {
       "get": {
-        "tags": [
-          "Version API"
-        ],
-        "description": "Get all versions of a specific record",
+        "tags": ["Version API"],
+        "summary": "Get all versions of a specific record",
+        "description": "Returns all available versions of a record within a registry and namespace. Requires authentication.",
         "operationId": "getRecordVersions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
             "name": "namespace",
+            "required": true,
+            "description": "Namespace ID or verified domain",
             "schema": {
               "type": "string"
-            },
-            "required": true,
-            "description": "Namespace ID or verified domain"
+            }
           },
           {
             "in": "path",
             "name": "registry_name",
+            "required": true,
+            "description": "Name of the registry",
             "schema": {
               "type": "string"
-            },
-            "required": true,
-            "description": "Name of the registry"
+            }
           },
           {
             "in": "path",
             "name": "record_name",
+            "required": true,
+            "description": "Name of the record",
             "schema": {
               "type": "string"
-            },
-            "required": true,
-            "description": "Name of the record"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response with version information",
+            "description": "Record version list retrieved successfully",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RecordVersionLookup"
+                "example": {
+                  "message": "Resource retrieved successfully",
+                  "data": {
+                    "created_by": "admin@example.com",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string" },
+                        "age": { "type": "number" }
+                      }
+                    },
+                    "created_at": "2024-01-01T00:00:00.000Z",
+                    "updated_at": "2024-07-08T12:34:56.000Z",
+                    "total_versions": 1,
+                    "versions": ["string"],
+                    "ttl": 600
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or missing parameters",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missing_namespace": {
+                    "value": {
+                      "message": "Invalid input: namespace is missing",
+                      "data": null
+                    }
+                  },
+                  "missing_registry": {
+                    "value": {
+                      "message": "Invalid input: registry_name is missing",
+                      "data": null
+                    }
+                  },
+                  "missing_record": {
+                    "value": {
+                      "message": "Invalid input: record_name is missing",
+                      "data": null
+                    }
+                  },
+                  "namespace_not_found": {
+                    "value": {
+                      "message": "namespace not found"
+                    }
+                  },
+                  "registry_not_found": {
+                    "value": {
+                      "message": "registry not found"
+                    }
+                  },
+                  "record_not_found": {
+                    "value": {
+                      "message": "record not found"
+                    }
+                  }
                 }
               }
             }
@@ -860,48 +1486,20 @@
             "description": "Unauthorized",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                "example": {
+                  "message": "Unauthorized",
+                  "data": null
                 }
               }
             }
           },
-          "404": {
-            "description": "Record Not found",
+          "500": {
+            "description": "Unexpected server error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "423": {
-            "description": "Locked",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "451": {
-            "description": "Not available for legal reasons",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "501": {
-            "description": "Method not implemented",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                "example": {
+                  "message": "An unexpected error occurred",
+                  "data": "Some error message"
                 }
               }
             }
@@ -911,448 +1509,11 @@
     }
   },
   "components": {
-    "schemas": {
-      "NamespaceLookup": {
-        "type": "object",
-        "description": "Namespace details",
-        "properties": {
-          "namespace": {
-            "type": "string",
-            "description": "Namespace name or domain"
-          },
-          "namespace_id": {
-            "type": "string",
-            "description": "Unique namespace identifier"
-          },
-          "description": {
-            "type": "string",
-            "description": "Namespace description"
-          },
-          "created_by": {
-            "type": "string",
-            "description": "Creator of the namespace"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp"
-          },
-          "registry_count": {
-            "type": "integer",
-            "description": "Number of registries in this namespace"
-          },
-          "meta":{
-            "type": "object",
-            "description": "Meta data of namespace"
-          }
-        }
-      },
-      "RegistryLookup": {
-        "type": "object",
-        "description": "Registry details",
-        "properties": {
-          "namespace": {
-            "type": "string",
-            "description": "Namespace name or domain"
-          },
-          "namespace_id": {
-            "type": "string",
-            "description": "Unique namespace identifier"
-          },
-          "registry_id": {
-            "type": "string",
-            "description": "Unique registry identifier"
-          },
-          "registry_name": {
-            "type": "string",
-            "description": "Registry name (unique within namespace)"
-          },
-          "description": {
-            "type": "string",
-            "description": "Registry description"
-          },
-          "created_by": {
-            "type": "string",
-            "description": "Creator of the registry"
-          },
-          "schema": {
-            "type": "object",
-            "description": "Schema definition for records in this registry"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp"
-          },
-          "record_count": {
-            "type": "integer",
-            "description": "Number of records in this registry"
-          },
-          "version_count": {
-            "type": "integer",
-            "description": "Number of versions across all records"
-          },
-          "query_allowed": {
-            "type": "boolean",
-            "description": "Indicates if query operations are permitted"
-          },
-          "meta":{
-            "type": "object",
-            "description": "Meta data of registry"
-          }
-        },
-        "required": [
-          "registry_id",
-          "registry_name",
-          "description",
-          "created_by",
-          "schema",
-          "created_at"
-        ]
-      },
-      "NamespaceQuery": {
-        "type": "object",
-        "description": "Namespace query results",
-        "properties": {
-          "created_by": {
-            "type": "string",
-            "description": "Namespace creator"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Namespace creation timestamp"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Namespace last update timestamp"
-          },
-          "total_registries": {
-            "type": "integer",
-            "description": "Total number of registries matching query"
-          },
-          "registries": {
-            "type": "array",
-            "description": "List of registries",
-            "items": {
-              "type": "object",
-              "properties": {
-                "registry_id": {
-                  "type": "string"
-                },
-                "registry_name": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                },
-                "created_at": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "meta":{
-                "type": "object",
-                "description": "Meta data of registry"
-                }
-              }
-            }
-          },
-          "page": {
-            "type": "integer",
-            "description": "Current page number"
-          },
-          "page_size": {
-            "type": "integer",
-            "description": "Number of items per page"
-          }
-        }
-      },
-      "RegistryQuery": {
-        "type": "object",
-        "description": "Registry query results",
-        "properties": {
-          "created_by": {
-            "type": "string",
-            "description": "Registry creator"
-          },
-          "schema": {
-            "type": "object",
-            "description": "Registry schema definition"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Registry creation timestamp"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Registry last update timestamp"
-          },
-          "total_records": {
-            "type": "integer",
-            "description": "Total number of records matching query"
-          },
-          "records": {
-            "type": "array",
-            "description": "List of records",
-            "items": {
-              "type": "object",
-              "properties": {
-                "record_id": {
-                  "type": "string"
-                },
-                "record_name": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                },
-                "created_at": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "meta":{
-                  "type": "object",
-                  "description": "Meta data of record"
-                }
-              }
-            }
-          },
-          "page": {
-            "type": "integer",
-            "description": "Current page number"
-          },
-          "page_size": {
-            "type": "integer",
-            "description": "Number of items per page"
-          }
-        }
-      },
-      "RecordLookup": {
-        "type": "object",
-        "description": "Record details",
-        "properties": {
-          "namespace": {
-            "type": "string",
-            "description": "Namespace name or domain"
-          },
-          "namespace_id": {
-            "type": "string",
-            "description": "Unique namespace identifier"
-          },
-          "registry_id": {
-            "type": "string",
-            "description": "Unique registry identifier"
-          },
-          "registry_name": {
-            "type": "string",
-            "description": "Registry name"
-          },
-          "record_id": {
-            "type": "string",
-            "description": "Unique record identifier"
-          },
-          "record_name": {
-            "type": "string",
-            "description": "Record name (unique within registry)"
-          },
-          "description": {
-            "type": "string",
-            "description": "Record description"
-          },
-          "schema": {
-            "type": "object",
-            "description": "Schema definition for this record"
-          },
-          "details": {
-            "type": "object",
-            "description": "Record data according to schema"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp"
-          },
-          "last_updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp"
-          },
-          "created_by": {
-            "type": "string",
-            "description": "Creator of the record"
-          },
-          "meta":{
-            "type": "object",
-            "description": "Meta data of record"
-          }
-        },
-        "required": [
-          "record_id",
-          "record_name",
-          "details",
-          "created_at",
-          "created_by"
-        ]
-      },
-      "NamespaceVersionLookup": {
-        "type": "object",
-        "description": "Namespace version information",
-        "properties": {
-          "namespace_id": {
-            "type": "string",
-            "description": "Unique namespace identifier"
-          },
-          "name": {
-            "type": "string",
-            "description": "Namespace name"
-          },
-          "total_versions": {
-            "type": "integer",
-            "description": "Total number of versions",
-            "default": 1
-          },
-          "versions": {
-            "type": "array",
-            "description": "List of all versions",
-            "items": {
-              "type": "string",
-              "default": "e3b0c44298fc1c149afbae41e4649b934ca495991b7852b855"
-            }
-          }
-        }
-      },
-      "RegistryVersionLookup": {
-        "type": "object",
-        "description": "Registry version information",
-        "properties": {
-          "namespace_id": {
-            "type": "string",
-            "description": "Unique namespace identifier"
-          },
-          "registry_id": {
-            "type": "string",
-            "description": "Unique registry identifier"
-          },
-          "registry_name": {
-            "type": "string",
-            "description": "Unique registry name"
-          },
-          "total_versions": {
-            "type": "integer",
-            "description": "Total number of versions",
-            "default": 1
-          },
-          "versions": {
-            "type": "array",
-            "description": "List of all versions",
-            "items": {
-              "type": "string",
-              "default": "e3b0c44298fc1c149afbae41e4649b934ca495991b7852b855"
-            }
-          }
-        }
-      },
-      "RecordVersionLookup": {
-        "type": "object",
-        "description": "Record version information",
-        "properties": {
-          "record_id": {
-            "type": "string",
-            "description": "Unique record identifier"
-          },
-          "record_name": {
-            "type": "string",
-            "description": "Record name"
-          },
-          "total_versions": {
-            "type": "integer",
-            "description": "Total number of versions",
-            "default": 1
-          },
-          "versions": {
-            "type": "array",
-            "description": "List of all versions",
-            "items": {
-              "type": "string",
-              "default": "e3b0c44298fc1c149afbae41e4649b934ca495991b7852b855"
-            }
-          }
-        }
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "description": "Standard error response",
-        "properties": {
-          "error": {
-            "type": "string",
-            "description": "Error type"
-          },
-          "description": {
-            "type": "string",
-            "description": "Detailed error description"
-          },
-          "code": {
-            "type": "string",
-            "description": "Error code"
-          }
-        }
-      }
-    },
-    "examples": {
-      "ErrorResponseExample400": {
-        "value": {
-          "error": "Bad Request",
-          "description": "Invalid query parameters",
-          "code": "400"
-        }
-      },
-      "ErrorResponseExample401": {
-        "value": {
-          "error": "Unauthorized",
-          "description": "Authentication required",
-          "code": "401"
-        }
-      },
-      "ErrorResponseExample402": {
-        "value": {
-          "error": "Payment Required",
-          "description": "Payment required to access this resource",
-          "code": "402"
-        }
-      },
-      "ErrorResponseExample404": {
-        "value": {
-          "error": "Not Found",
-          "description": "The requested resource was not found",
-          "code": "404"
-        }
-      },
-      "ErrorResponseExample423": {
-        "value": {
-          "error": "Locked",
-          "description": "Resource is locked by the owner",
-          "code": "423"
-        }
-      },
-      "ErrorResponseExample451": {
-        "value": {
-          "error": "Unavailable for Legal Reasons",
-          "description": "Access restricted for legal reasons",
-          "code": "451"
-        }
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
