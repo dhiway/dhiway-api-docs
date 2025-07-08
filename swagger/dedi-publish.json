@@ -43,9 +43,7 @@
   "paths": {
     "/dedi/register": {
       "post": {
-        "tags": [
-          "Access"
-        ],
+        "tags": ["Access"],
         "summary": "Register a new user",
         "requestBody": {
           "required": true,
@@ -54,23 +52,18 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "username": {
-                    "type": "string"
-                  },
-                  "firstname": {
-                    "type": "string"
-                  },
-                  "lastname": {
-                    "type": "string"
-                  },
+                  "username": { "type": "string" },
+                  "firstname": { "type": "string" },
+                  "lastname": { "type": "string" },
                   "email": {
                     "type": "string",
                     "format": "email"
                   },
-                  "password": {
+                  "hashed_password": {
                     "type": "string",
-                    "format": "password",
-                    "minLength": 8
+                    "example": "84f85a91f53e19e2ab986d2411022cc81ea8a561d2635a54c2259c9016658b89",
+                    "description": "Must be at least 64 characters (256-bit hash)",
+                    "minLength": 64
                   }
                 },
                 "required": [
@@ -78,7 +71,7 @@
                   "firstname",
                   "lastname",
                   "email",
-                  "password"
+                  "hashed_password"
                 ]
               }
             }
@@ -86,14 +79,102 @@
         },
         "responses": {
           "201": {
-            "description": "User registered successfully",
+            "description": "Account created successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Account created successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Keycloak response data"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid or missing input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: firstname is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: email is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Account already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Account already exists"
+                    },
+                    "data": {
+                      "type": "string",
+                      "example": "Username or email already registered"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
                     }
                   }
                 }
@@ -105,9 +186,7 @@
     },
     "/dedi/login": {
       "post": {
-        "tags": [
-          "Access"
-        ],
+        "tags": ["Access"],
         "summary": "Login a user",
         "requestBody": {
           "required": true,
@@ -120,15 +199,14 @@
                     "type": "string",
                     "format": "email"
                   },
-                  "password": {
+                  "hashed_password": {
                     "type": "string",
-                    "format": "password"
+                    "example": "84f85a91f53e19e2ab986d2411022cc81ea8a561d2635a54c2259c9016658b89",
+                    "minLength": 64,
+                    "description": "The hashed password (minimum 64 characters)"
                   }
                 },
-                "required": [
-                  "email",
-                  "password"
-                ]
+                "required": ["email", "hashed_password"]
               }
             }
           }
@@ -141,11 +219,102 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "token": {
-                      "type": "string"
+                    "message": {
+                      "type": "string",
+                      "example": "Login successful"
                     },
-                    "refresh_token": {
-                      "type": "string"
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": { "type": "string" },
+                        "token_type": { "type": "string" },
+                        "expires_in": { "type": "integer", "example": "600" },
+                        "refresh_token": { "type": "string" },
+                        "refresh_expires_in": {
+                          "type": "integer",
+                          "example": "600"
+                        },
+                        "creator_id": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - hashed_password missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: hashed_password is missing"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing email, wrong credentials, or not verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: email is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": "Invalid credentials"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Resource not found"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
                     }
                   }
                 }
@@ -157,9 +326,7 @@
     },
     "/dedi/resend-verify": {
       "post": {
-        "tags": [
-          "Access"
-        ],
+        "tags": ["Access"],
         "summary": "Resend verification email",
         "security": [
           {
@@ -178,9 +345,7 @@
                     "format": "email"
                   }
                 },
-                "required": [
-                  "email"
-                ]
+                "required": ["email"]
               }
             }
           }
@@ -194,7 +359,71 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Verification email sent successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing or malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: required fields are missing or malformed"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Resource not found"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
                     }
                   }
                 }
@@ -206,9 +435,7 @@
     },
     "/dedi/token/refresh": {
       "post": {
-        "tags": [
-          "Access"
-        ],
+        "tags": ["Access"],
         "summary": "Refresh access token",
         "security": [
           {
@@ -226,9 +453,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "refresh_token"
-                ]
+                "required": ["refresh_token"]
               }
             }
           }
@@ -241,8 +466,85 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "token": {
-                      "type": "string"
+                    "message": {
+                      "type": "string",
+                      "example": "Token refreshed successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": { "type": "string" },
+                        "expires_in": { "type": "integer" },
+                        "refresh_expires_in": { "type": "integer" },
+                        "refresh_token": { "type": "string" },
+                        "token_type": { "type": "string" },
+                        "not-before-policy": { "type": "integer" },
+                        "session_state": { "type": "string" },
+                        "scope": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing or malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: required fields are missing or malformed"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or expired refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
                     }
                   }
                 }
@@ -254,33 +556,13 @@
     },
     "/dedi/logout": {
       "post": {
-        "tags": [
-          "Access"
-        ],
+        "tags": ["Access"],
         "summary": "Logout user",
         "security": [
           {
             "bearerAuth": []
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "token"
-                ]
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Logged out successfully",
@@ -290,7 +572,50 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Logged out successfully"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing Authorization header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Missing authorization"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
                     }
                   }
                 }
@@ -302,9 +627,7 @@
     },
     "/dedi/create-namespace": {
       "post": {
-        "tags": [
-          "Publish"
-        ],
+        "tags": ["Publish"],
         "summary": "Create a new namespace",
         "security": [
           {
@@ -323,25 +646,196 @@
                   },
                   "description": {
                     "type": "string"
-                 },
-                "meta": {
-                  "type": "object",
-                  "additionalProperties": true
+                  },
+                  "meta": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "version_count": {
+                    "type": "integer",
+                    "nullable": true
                   }
-                }
+                },
+                "required": ["name", "description"]
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Created",
+            "description": "Namespace created successfully",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Namespace created successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "namespace_id": {
+                          "type": "string",
+                          "example": "namespace:cord:xyz"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing Authorization header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: authorization is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Input or logical errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
                 },
-                "example": "created"
+                "examples": {
+                  "missing_name": {
+                    "value": {
+                      "message": "Invalid input: name is missing",
+                      "data": null
+                    }
+                  },
+                  "missing_description": {
+                    "value": {
+                      "message": "Invalid input: description is missing",
+                      "data": null
+                    }
+                  },
+                  "invalid_jwt": {
+                    "value": {
+                      "message": "Invalid JWT token",
+                      "data": null
+                    }
+                  },
+                  "insufficient_credits": {
+                    "value": {
+                      "message": "Not have enough credits to perform this operation",
+                      "data": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User not found"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Namespace already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Namespace already exists"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                },
+                "examples": {
+                  "db_error": {
+                    "value": {
+                      "message": "Database error while fetching user",
+                      "data": "connection refused"
+                    }
+                  },
+                  "key_error": {
+                    "value": {
+                      "message": "Failed to generate keys for the user",
+                      "data": "mnemonic invalid"
+                    }
+                  },
+                  "chain_error": {
+                    "value": {
+                      "message": "Failed to create namespace on the chain",
+                      "data": null
+                    }
+                  },
+                  "tx_error": {
+                    "value": {
+                      "message": "Unexpected error occurred during namespace creation",
+                      "data": "timeout"
+                    }
+                  }
+                }
               }
             }
           }
@@ -350,9 +844,7 @@
     },
     "/dedi/{namespace}/create-registry": {
       "post": {
-        "tags": [
-          "Publish"
-        ],
+        "tags": ["Publish"],
         "summary": "Create a new registry",
         "security": [
           {
@@ -376,39 +868,213 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "registry_name": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
+                  "registry_name": { "type": "string" },
+                  "description": { "type": "string" },
                   "schema": {
                     "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    }
+                    "additionalProperties": { "type": "string" }
                   },
-                  "query_allowed": {
-                    "type": "boolean"
+                  "fields_to_anchor": {
+                    "type": "array",
+                    "items": { "type": "string" }
                   },
                   "meta": {
-                  "type": "object",
-                  "additionalProperties": true
+                    "type": "object",
+                    "additionalProperties": true
                   }
-                }
+                },
+                "required": ["registry_name", "description", "schema"]
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Created",
+            "description": "Registry created",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry created"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "registry_id": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: jwt is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid/missing inputs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
                 },
-                "example": "created"
+                "examples": {
+                  "missing_namespace": {
+                    "value": {
+                      "message": "Invalid input: namespace is missing",
+                      "data": null
+                    }
+                  },
+                  "missing_registry_name": {
+                    "value": {
+                      "message": "Invalid input: registry_name is missing",
+                      "data": null
+                    }
+                  },
+                  "missing_description": {
+                    "value": {
+                      "message": "Invalid input: description is missing",
+                      "data": null
+                    }
+                  },
+                  "missing_schema": {
+                    "value": {
+                      "message": "Invalid input: schema is missing",
+                      "data": null
+                    }
+                  },
+                  "invalid_jwt": {
+                    "value": {
+                      "message": "Invalid JWT token",
+                      "data": "jwt malformed"
+                    }
+                  },
+                  "invalid_schema_format": {
+                    "value": {
+                      "message": "Invalid schema format",
+                      "data": {
+                        "errors": ["Missing type property", "Invalid structure"]
+                      }
+                    }
+                  },
+                  "insufficient_credits": {
+                    "value": {
+                      "message": "Not have enough credits to perform this operation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Not authorized for this namespace",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Not enough privileges to perform this action"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - User or namespace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                },
+                "examples": {
+                  "user_not_found": {
+                    "value": { "message": "User not found" }
+                  },
+                  "namespace_not_found": {
+                    "value": { "message": "namespace not found" }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Registry already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry already exists"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Unexpected failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                },
+                "examples": {
+                  "db_error": {
+                    "value": {
+                      "message": "Database error while fetching user",
+                      "data": "connection refused"
+                    }
+                  },
+                  "unexpected_error": {
+                    "value": {
+                      "message": "An unexpected error occurred",
+                      "data": "timeout"
+                    }
+                  }
+                }
               }
             }
           }
@@ -417,9 +1083,7 @@
     },
     "/dedi/{namespace}/{registry_name}/add-record": {
       "post": {
-        "tags": [
-          "Publish"
-        ],
+        "tags": ["Publish"],
         "summary": "Add a new record to a registry",
         "security": [
           {
@@ -464,23 +1128,139 @@
                     }
                   },
                   "meta": {
-                  "type": "object",
-                  "additionalProperties": true
+                    "type": "object",
+                    "additionalProperties": true
                   }
-                }
+                },
+                "required": ["record_name", "description", "details"]
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "created",
+            "description": "Record created",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
-                },
-                "example": "created"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "record_id": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or schema mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Namespace or Registry not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Duplicate record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                }
               }
             }
           }
@@ -489,9 +1269,7 @@
     },
     "/dedi/{namespace}/{registry_name}/add-delegate": {
       "post": {
-        "tags": [
-          "Delegation"
-        ],
+        "tags": ["Delegation"],
         "summary": "Add a new delegate to a registry",
         "security": [
           {
@@ -524,12 +1302,11 @@
                 "type": "object",
                 "properties": {
                   "email": {
-                    "type": "string"
-                  },
-                  "permission": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Email of the user to add as a delegate"
                   }
-                }
+                },
+                "required": ["email"]
               }
             }
           }
@@ -538,23 +1315,121 @@
           "200": {
             "description": "Delegate added successfully",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
-                },
-                "example": "Delegate added successfully"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Delegate added successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g., missing inputs or user not found)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: jwt is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid JWT token"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not authorized to add delegates to this registry"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - user, registry or namespace",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "namespace not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
               }
             }
           }
         }
       }
     },
-    "/dedi/generate-dns-txt/{namespace}/{domain}": {
+    "/dedi/generate-dns-txt/{namespace_id}/{domain}": {
       "get": {
-        "tags": [
-          "Domain verification"
-        ],
-        "summary": "Generate txt",
+        "tags": ["Domain verification"],
+        "summary": "Generate a DNS TXT record for domain verification",
         "security": [
           {
             "bearerAuth": []
@@ -562,7 +1437,7 @@
         ],
         "parameters": [
           {
-            "name": "namespace",
+            "name": "namespace_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -574,37 +1449,91 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "hostname"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Generated domain's DNS TXT record",
+            "description": "DNS TXT record generated or retrieved",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
-                },
-                "example": "Generated domain's DNS TXT record"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Generated domain's DNS TXT record"
+                    },
+                    "txt": {
+                      "type": "string",
+                      "example": "cord-verification=abc123xyz"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid domain or domain taken)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid domain format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Namespace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Namespace not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal server error while generating DNS TXT record"
+                    }
+                  }
+                }
               }
             }
           }
         }
       }
-    },  
+    },
     "/dedi/verify-domain": {
       "post": {
-        "tags": [
-          "Domain verification"
-        ],
-        "summary": "Add a new delegate to a registry",
+        "tags": ["Domain verification"],
+        "summary": "Verify domain TXT record for a namespace",
         "security": [
           {
             "bearerAuth": []
           }
-        ],
-        "parameters": [
         ],
         "requestBody": {
           "required": true,
@@ -612,6 +1541,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": ["namespace_id"],
                 "properties": {
                   "namespace_id": {
                     "type": "string"
@@ -625,23 +1555,78 @@
           "200": {
             "description": "Verification Successful",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
-                },
-                "example": "Verification Successful"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Verification Successful"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing or invalid namespace_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Namespace ID is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "TXT record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Verification failed: TXT record not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - DNS resolution failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error resolving DNS TXT records"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Some internal error detail"
+                    }
+                  }
+                }
               }
             }
           }
         }
       }
     },
-    "/dedi/check-verification/{namespace}": {
+    "/dedi/check-verification/{namespace_id}": {
       "get": {
-        "tags": [
-          "Domain verification"
-        ],
-        "summary": "Check verification status",
+        "tags": ["Domain verification"],
+        "summary": "Check domain verification status for a namespace",
         "security": [
           {
             "bearerAuth": []
@@ -649,7 +1634,7 @@
         ],
         "parameters": [
           {
-            "name": "namespace",
+            "name": "namespace_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -659,25 +1644,81 @@
         ],
         "responses": {
           "200": {
-            "description": "Generated domain's DNS TXT record",
+            "description": "Verification status returned",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
-                },
-                "example": "Generated domain's DNS TXT record"
+                  "type": "object",
+                  "properties": {
+                    "verified": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "domain": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": "example.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing namespace_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Namespace ID is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Namespace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Namespace not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
               }
             }
           }
         }
       }
-    }, 
-    "/dedi/{namespace}/update-namepsace": {
+    },
+    "/dedi/{namespace}/update-namespace": {
       "post": {
-        "tags": [
-          "Update"
-        ],
-        "summary": "Update an existing namepsace",
+        "tags": ["Update"],
+        "summary": "Update an existing namespace",
         "security": [
           {
             "bearerAuth": []
@@ -694,7 +1735,7 @@
           }
         ],
         "requestBody": {
-          "required": false,
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -712,20 +1753,120 @@
                       "type": "string"
                     }
                   }
-                }
+                },
+                "minProperties": 1,
+                "description": "At least one of `name` or `description` must be provided"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Updated",
+            "description": "Namespace updated",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
-                },
-                "example": "updated"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "namespace updated"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "digest": {
+                          "type": "string",
+                          "example": "0xabc123..."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: Either name or description is mandatory"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: jwt is missing"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Unauthorized to update namespace",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Not enough privileges to perform this action"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Namespace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "namespace not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
               }
             }
           }
@@ -734,10 +1875,9 @@
     },
     "/dedi/{namespace}/{registry_name}/update-registry": {
       "post": {
-        "tags": [
-          "Update"
-        ],
+        "tags": ["Update"],
         "summary": "Update an existing registry",
+        "description": "Allows an authorized user to update a registry's description, metadata, and query allowance flag.",
         "security": [
           {
             "bearerAuth": []
@@ -750,7 +1890,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "The namespace ID or domain of the registry."
           },
           {
             "name": "registry_name",
@@ -758,7 +1899,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "The name of the registry to update."
           }
         ],
         "requestBody": {
@@ -768,17 +1910,23 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "new_registry_name": {
-                    "type": "string"
-                  },
                   "description": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Updated description of the registry"
                   },
                   "meta": {
                     "type": "object",
                     "additionalProperties": {
                       "type": "string"
+                    },
+                    "example": {
+                      "department": "Finance",
+                      "location": "IN"
                     }
+                  },
+                  "query_allowed": {
+                    "type": "boolean",
+                    "example": true
                   }
                 }
               }
@@ -787,13 +1935,120 @@
         },
         "responses": {
           "201": {
-            "description": "Updated",
+            "description": "Registry updated",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
-                },
-                "example": "Registry updated"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry updated"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "digest": {
+                          "type": "string",
+                          "example": "0xabc123..."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request (e.g. missing parameters or invalid input)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: namespace is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid JWT token"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User lacks privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Not enough privileges to perform this action"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Namespace or registry not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
               }
             }
           }
@@ -802,10 +2057,9 @@
     },
     "/dedi/{namespace}/{registry_name}/{record_name}/update-record": {
       "post": {
-        "tags": [
-          "Update"
-        ],
+        "tags": ["Update"],
         "summary": "Update an existing record in a registry",
+        "description": "Updates a record's details, description, or meta in a given registry under a namespace. Requires proper authorization.",
         "security": [
           {
             "bearerAuth": []
@@ -818,7 +2072,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Namespace ID or domain name"
           },
           {
             "name": "registry_name",
@@ -826,7 +2081,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Name of the registry"
           },
           {
             "name": "record_name",
@@ -834,457 +2090,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "new_record_name": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  },
-                  "details": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    }
-                  },
-                  "meta": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Updated",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "updated"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/{namespace}/{registry_name}/revoke-registry": {
-      "post": {
-        "tags": [
-          "State management"
-        ],
-        "summary": "Revoke a registry",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "namespace",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "registry_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Registry revoked",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Registry revoked"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/{namespace}/{registry_name}/reinstate-registry": {
-      "post": {
-        "tags": [
-          "State management"
-        ],
-        "summary": "Reinstate a registry",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "namespace",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "registry_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Registry reinstated",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Registry reinstated"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/{namespace}/{registry_name}/archive-registry": {
-      "post": {
-        "tags": [
-          "State management"
-        ],
-        "summary": "Archive a registry",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "namespace",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "registry_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Registry archived",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Registry archived"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/{namespace}/{registry_name}/restore-registry": {
-      "post": {
-        "tags": [
-          "State management"
-        ],
-        "summary": "Restore a registry",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "namespace",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "registry_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Registry restored",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Registry restored"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/{namespace}/{registry_name}/{record_name}/revoke-record": {
-      "post": {
-        "tags": [
-          "State management"
-        ],
-        "summary": "Revoke a record",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "namespace",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "registry_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "record_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Record revoked",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Record revoked"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/{namespace}/{registry_name}/{record_name}/reinstate-record": {
-      "post": {
-        "tags": [
-          "State management"
-        ],
-        "summary": "Reinstate a record",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "namespace",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "registry_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "record_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Record reinstated",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Record reinstated"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/{namespace}/{registry_name}/{record_name}/archive-record": {
-      "post": {
-        "tags": [
-          "State management"
-        ],
-        "summary": "Archive a record",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "namespace",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "registry_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "record_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Record archived",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Record archived"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/{namespace}/{registry_name}/{record_name}/restore-record": {
-      "post": {
-        "tags": [
-          "State management"
-        ],
-        "summary": "Restore a record",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "namespace",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "registry_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "record_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Record restored",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Record restored"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/dedi/{namespace}/bulk-upload": {
-      "post": {
-        "tags": [
-          "Publish"
-        ],
-        "summary": "Create a registry and Bulk upload records to the registry",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "namespace",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            },
+            "description": "Name of the record to be updated"
           }
         ],
         "requestBody": {
@@ -1293,39 +2100,31 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": ["details"],
                 "properties": {
-                  "registry_details": {
+                  "description": {
+                    "type": "string",
+                    "example": "Updated description for the record"
+                  },
+                  "details": {
                     "type": "object",
-                    "properties": {
-                      "registry_name": {
-                        "type": "string"
-                      },
-                      "description": {
-                        "type": "string"
-                      },
-                      "schema": {
-                        "type": "object",
-                        "additionalProperties": {
-                          "type": "string"
-                        }
-                      }
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "example": {
+                      "name": "Alice",
+                      "dob": "1992-10-12",
+                      "city": "Pune"
                     }
                   },
-                  "data": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "record_name": {
-                          "type": "string"
-                        },
-                        "details": {
-                          "type": "object",
-                          "additionalProperties": {
-                            "type": "string"
-                          }
-                        }
-                      }
+                  "meta": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "example": {
+                      "source": "bulk-upload",
+                      "verified_by": "admin"
                     }
                   }
                 }
@@ -1334,14 +2133,1100 @@
           }
         },
         "responses": {
-          "201": {
-            "description": "Bulk upload successful",
+          "200": {
+            "description": "Record updated",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Record updated"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "digest": {
+                          "type": "string",
+                          "example": "0xabc123..."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid input: details is missing"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid JWT token"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - user not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Not enough privileges to perform this action"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - namespace, registry or record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Record not found"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "An unexpected error occurred"
+                    },
+                    "data": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/revoke-registry": {
+      "post": {
+        "tags": ["State management"],
+        "summary": "Revoke a registry",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registry revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Regsitry has been revoked"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: Missing JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found or invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/reinstate-registry": {
+      "post": {
+        "tags": ["State management"],
+        "summary": "Reinstate a registry",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registry reinstated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry has been reinstated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: Missing JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found or invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/archive-registry": {
+      "post": {
+        "tags": ["State management"],
+        "summary": "Archive a registry",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registry archived",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry has been archived"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: Missing JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found or invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/restore-registry": {
+      "post": {
+        "tags": ["State management"],
+        "summary": "Restore a registry",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registry restored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Registry has been restored"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized: Missing JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found or invalid state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "data": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/{record_name}/revoke-record": {
+      "post": {
+        "tags": ["State management"],
+        "summary": "Revoke a record",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "record_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record has been revoked",
+            "content": {
+              "application/json": {
+                "example": { "message": "Record has been revoked" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingNamespace": {
+                    "value": {
+                      "message": "Invalid input: namespace is missing",
+                      "data": null
+                    }
+                  },
+                  "missingRegistry": {
+                    "value": {
+                      "message": "Invalid input: registry_name is missing",
+                      "data": null
+                    }
+                  },
+                  "missingRecord": {
+                    "value": {
+                      "message": "Invalid input: record_name is missing",
+                      "data": null
+                    }
+                  },
+                  "invalidJwt": {
+                    "value": { "message": "Invalid JWT token", "data": "..." }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid input: jwt is missing",
+                  "data": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Not enough privileges to perform this action"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "namespaceNotFound": {
+                    "value": { "message": "namespace not found", "data": null }
+                  },
+                  "registryNotFound": {
+                    "value": { "message": "registry not found", "data": null }
+                  },
+                  "recordNotFound": {
+                    "value": { "message": "Record not found", "data": null }
+                  },
+                  "alreadyRevoked": {
+                    "value": {
+                      "message": "Record revocation has already been completed",
+                      "data": null
+                    }
+                  },
+                  "archivedRecord": {
+                    "value": {
+                      "message": "Archived record canot be revoked",
+                      "data": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "An unexpected error occurred",
+                  "data": "..."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/{record_name}/reinstate-record": {
+      "post": {
+        "tags": ["State management"],
+        "summary": "Reinstate a record",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "record_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record has been reinstated",
+            "content": {
+              "application/json": {
+                "example": { "message": "Record has been reinstated" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingNamespace": {
+                    "value": {
+                      "message": "Invalid input: namespace is missing",
+                      "data": null
+                    }
+                  },
+                  "invalidJwt": {
+                    "value": { "message": "Invalid JWT token", "data": "..." }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid input: jwt is missing",
+                  "data": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Not enough privileges to perform this action"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "recordActive": {
+                    "value": { "message": "Record is active", "data": null }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "An unexpected error occurred",
+                  "data": "..."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/{record_name}/archive-record": {
+      "post": {
+        "tags": ["State management"],
+        "summary": "Archive a record",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "record_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record has been archived",
+            "content": {
+              "application/json": {
+                "example": { "message": "Record has been archived" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid input: namespace is missing",
+                  "data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid input: jwt is missing",
+                  "data": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Not enough privileges to perform this action"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "revokedRecord": {
+                    "value": {
+                      "message": "Revoked record canot be archived",
+                      "data": null
+                    }
+                  },
+                  "alreadyArchived": {
+                    "value": {
+                      "message": "Record archive has already been completed",
+                      "data": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "An unexpected error occurred",
+                  "data": "..."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/{namespace}/{registry_name}/{record_name}/restore-record": {
+      "post": {
+        "tags": ["State management"],
+        "summary": "Restore a record",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "registry_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "record_name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record has been restored",
+            "content": {
+              "application/json": {
+                "example": { "message": "Record has been restored" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid input: record_name is missing",
+                  "data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid input: jwt is missing",
+                  "data": null
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Not enough privileges to perform this action"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "recordActive": {
+                    "value": { "message": "Record is active", "data": null }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "An unexpected error occurred",
+                  "data": "..."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dedi/bulk-upload": {
+      "post": {
+        "tags": ["Publish"],
+        "summary": "Create a registry and bulk upload records to the registry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "namespace": {
+                    "type": "string",
+                    "description": "Namespace to which the registry and records belong"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "CSV or JSON files for bulk upload"
+                  }
                 },
-                "example": "Bulk upload completed successfully"
+                "required": ["files"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bulk upload job started successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bulk upload job started successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "jobId": {
+                          "type": "string",
+                          "example": "a3efefb1-f6c9-4d3f-8e9b-aaa1c94ddfc6"
+                        },
+                        "totalFiles": {
+                          "type": "integer",
+                          "example": 2
+                        },
+                        "statusCheckUrl": {
+                          "type": "string",
+                          "example": "/dedi/bulk-upload/status/a3efefb1-f6c9-4d3f-8e9b-aaa1c94ddfc6"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - missing or invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No files uploaded"
+                    },
+                    "data": {
+                      "type": "string",
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    },
+                    "data": {
+                      "type": "string",
+                      "example": null
+                    }
+                  }
+                }
               }
             }
           }
