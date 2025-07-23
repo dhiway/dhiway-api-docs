@@ -2462,7 +2462,118 @@
                     }
                 ]
             }
+        },
+           "/api/v1/watch": {
+        "post": {
+          "tags": ["Watcher"],
+          "operationId": "watcherRegister",
+          "description": "Register a watcher with identifier, recordPublicId, email, and optional callbackUrl.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "identifier": {
+                      "type": "string",
+                      "example": "stmt:cord:s3cnaB8ZqpSjvR1LLLB918jWBNqfoxPXprMAdVaKnWk1eMd8Y:fff35be4cfb6db0dbc182f110a255075a46f94b966162c623f3370c408c5e424"
+                    },
+                    "recordPublicId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "ed8ebd7c-6b84-4f4b-8a75-745eaf9946fa"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "example": "sujith.baruve@dhiway.com"
+                    },
+                    "callbackUrl": {
+                      "type": "string",
+                      "format": "uri",
+                      "example": "http://localhost:5001/api/v1/callback"
+                    }
+                  },
+                  "required": ["identifier", "recordPublicId", "email"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Watcher registered successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": { "type": "boolean", "example": true },
+                      "message": {
+                        "type": "string",
+                        "example": "Watcher registered"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "409": {
+              "description": "Watcher already exists",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": { "type": "boolean", "example": false },
+                      "message": {
+                        "type": "string",
+                        "example": "Watcher already exists"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid input",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": { "type": "boolean", "example": false },
+                      "message": {
+                        "type": "string",
+                        "example": "Invalid input data"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": { "type": "boolean", "example": false },
+                      "message": { "type": "string", "example": "Server error" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "security": [
+            {
+              "bearerAuth": []
+            }
+          ]
         }
+      }
     },
     "components": {
         "securitySchemes": {
