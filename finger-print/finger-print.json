@@ -1,0 +1,475 @@
+openapi: 3.0.0
+info:
+  title: Finger Print
+  version: 1.0.0
+servers:
+  - url: https://middleware.demo.dhiway.net/v1/auth
+  - url: https://middleware.demo.dhiway.net/v1/cord
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    apikeyAuth:
+      type: http
+      scheme: apikey
+tags:
+  - name: Auth
+  - name: Cord
+paths:
+  /user:
+    post:
+      tags:
+        - Auth
+      summary: Create User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: ashwin3@dhiway.com
+                password: ashwin@123
+                username: ashwin3
+                email_verified: true
+                firstname: ashwin
+                lastname: ck
+      responses:
+        '200':
+          description: OK
+          headers:
+            Server:
+              schema:
+                type: string
+                example: nginx/1.24.0 (Ubuntu)
+            Date:
+              schema:
+                type: string
+                example: Fri, 30 May 2025 10:24:05 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Content-Length:
+              schema:
+                type: integer
+                example: '198'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            vary:
+              schema:
+                type: string
+                example: >-
+                  origin, access-control-request-method,
+                  access-control-request-headers
+            access-control-allow-origin:
+              schema:
+                type: string
+                example: '*'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: 567abc4e-8a30-4504-be1d-195f4084a8c4
+                username: ashwin2
+                email: ashwin2@dhiway.com
+                firstname: ashwin
+                lastname: ck
+                email_verified: true
+                realm_roles:
+                  - default-roles-dhiway-test
+  /token:
+    post:
+      tags:
+        - Auth
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: ashwin
+                password: ashwin@123
+      responses:
+        '200':
+          description: OK
+          headers:
+            Server:
+              schema:
+                type: string
+                example: nginx/1.24.0 (Ubuntu)
+            Date:
+              schema:
+                type: string
+                example: Fri, 30 May 2025 09:20:37 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Content-Length:
+              schema:
+                type: integer
+                example: '2327'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            vary:
+              schema:
+                type: string
+                example: >-
+                  origin, access-control-request-method,
+                  access-control-request-headers
+            access-control-allow-origin:
+              schema:
+                type: string
+                example: '*'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                access_token: >-
+                  eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJZcE1WdUNYNnNlalM2UkVfeUVyQnY0SHI4cF9SbDFwWjlmR3FkMWNfbkhRIn0.eyJleHAiOjE3NDkwMjg4MzcsImlhdCI6MTc0ODU5NjgzNywianRpIjoiNDUwZDU2OGMtN2U3Zi00MGNiLWIxODMtYzFkMGQ2MTI2NmI4IiwiaXNzIjoiaHR0cHM6Ly9rZXljbG9hay5kZW1vLmRoaXdheS5jb20vcmVhbG1zL2RoaXdheS10ZXN0IiwiYXVkIjpbInJlYWxtLW1hbmFnZW1lbnQiLCJhY2NvdW50Il0sInN1YiI6ImVkN2YxZjA5LTM0MjItNGIwMC05NzRjLTFiMDRjODY3ZTMzZSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImRoaXdheUNsaWVudCIsInNlc3Npb25fc3RhdGUiOiJiYTE1NTdlMS1kYTFlLTQxZGItODAyZS01YTBlYTEyOGVlNzgiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbIi8qIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJkZWZhdWx0LXJvbGVzLWRoaXdheS10ZXN0Iiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7InJlYWxtLW1hbmFnZW1lbnQiOnsicm9sZXMiOlsibWFuYWdlLXVzZXJzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwic2lkIjoiYmExNTU3ZTEtZGExZS00MWRiLTgwMmUtNWEwZWExMjhlZTc4IiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJhc2h3aW4gY2siLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhc2h3aW4iLCJnaXZlbl9uYW1lIjoiYXNod2luIiwiZmFtaWx5X25hbWUiOiJjayIsImVtYWlsIjoiYXNod2luQGRoaXdheS5jb20ifQ.cRVRfVDuqn3lA3nIlmDCJ731RKXzOEsh2hrWzyWIWmmV_uBG_nmnQlQ2xVp-9jbOJivtzt2yMKdaQ9k44iHMYbCv60dK15F6DBWKTbNigW_1paPqHnQTRaX-VOpmaLl3C2c_3r59KVj2o9ls0yY3JYRrKviD6-potZsL-zaotQHSNi-6MuC0kef7OHpOZfHnWUDF4MQVXMG6JPM9LbkPDftSAQg--rJngRCZptZEoaR8reycxNKSwVBjSvAFBLfuCmzauShndOYgLZPJPnx4w75XEL6pwk5uvy4Ky035B9TkppaJcDcqCRnjKkzZSRJzEyfAadCOBAIRKv1dVzCrvg
+                token_type: Bearer
+                expires_in: 432000
+                refresh_token: >-
+                  eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3NjgzOGJhNC03YWM0LTQ3OWEtYjc2Yy01ZTk5YmRmNDJiYWIifQ.eyJleHAiOjE3NDkyMDE2MzcsImlhdCI6MTc0ODU5NjgzNywianRpIjoiYWI2M2QwMDQtNzQwMy00Yzk1LTg0YTgtMTJiMDU5YjYyOTkxIiwiaXNzIjoiaHR0cHM6Ly9rZXljbG9hay5kZW1vLmRoaXdheS5jb20vcmVhbG1zL2RoaXdheS10ZXN0IiwiYXVkIjoiaHR0cHM6Ly9rZXljbG9hay5kZW1vLmRoaXdheS5jb20vcmVhbG1zL2RoaXdheS10ZXN0Iiwic3ViIjoiZWQ3ZjFmMDktMzQyMi00YjAwLTk3NGMtMWIwNGM4NjdlMzNlIiwidHlwIjoiUmVmcmVzaCIsImF6cCI6ImRoaXdheUNsaWVudCIsInNlc3Npb25fc3RhdGUiOiJiYTE1NTdlMS1kYTFlLTQxZGItODAyZS01YTBlYTEyOGVlNzgiLCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwic2lkIjoiYmExNTU3ZTEtZGExZS00MWRiLTgwMmUtNWEwZWExMjhlZTc4In0.AwVlFraL0TaktNnS5TSDDwhdN9shWD_2Oseh1kjNymI
+                refresh_expires_in: 604800
+  /api-key:
+    post:
+      tags:
+        - Auth
+      summary: Create Api Key
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          headers:
+            Server:
+              schema:
+                type: string
+                example: nginx/1.24.0 (Ubuntu)
+            Date:
+              schema:
+                type: string
+                example: Fri, 30 May 2025 09:51:23 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Content-Length:
+              schema:
+                type: integer
+                example: '57'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            vary:
+              schema:
+                type: string
+                example: >-
+                  origin, access-control-request-method,
+                  access-control-request-headers
+            access-control-allow-origin:
+              schema:
+                type: string
+                example: '*'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                api_key: Lvkeh6Hy6EPjNZK8q5fAYBznEHuQMJjA-h9Sly4Xi6w
+    get:
+      tags:
+        - Auth
+      summary: Get Api key
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          headers:
+            Server:
+              schema:
+                type: string
+                example: nginx/1.24.0 (Ubuntu)
+            Date:
+              schema:
+                type: string
+                example: Fri, 30 May 2025 09:52:17 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Content-Length:
+              schema:
+                type: integer
+                example: '187'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            vary:
+              schema:
+                type: string
+                example: >-
+                  origin, access-control-request-method,
+                  access-control-request-headers
+            access-control-allow-origin:
+              schema:
+                type: string
+                example: '*'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                user_id: ed7f1f09-3422-4b00-974c-1b04c867e33e
+                api_key: Lvkeh6Hy6EPjNZK8q5fAYBznEHuQMJjA-h9Sly4Xi6w
+                enabled: true
+                status: active
+                created_at: '2025-05-30T09:51:23.902982+00:00'
+  /anchor-digest:
+    post:
+      tags:
+        - Cord
+      summary: Anchor Hash/Digest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                digest: >-
+                  0x5e9de2ca104975c0fe901b8bd37b98b50618544e9b7e242f2ab1ef0c323cc4ba
+      security:
+        - apikeyAuth: []
+      responses:
+        '200':
+          description: OK
+          headers:
+            Server:
+              schema:
+                type: string
+                example: nginx/1.24.0 (Ubuntu)
+            Date:
+              schema:
+                type: string
+                example: Fri, 30 May 2025 09:22:09 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Content-Length:
+              schema:
+                type: integer
+                example: '99'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            vary:
+              schema:
+                type: string
+                example: >-
+                  origin, access-control-request-method,
+                  access-control-request-headers
+            access-control-allow-origin:
+              schema:
+                type: string
+                example: '*'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: >-
+                  Digest received and successfully saved for user
+                  ed7f1f09-3422-4b00-974c-1b04c867e33e.
+  /anchor-digest/status:
+    get:
+      tags:
+        - Cord
+      summary: Get Status Hash/Digest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: digest
+          in: query
+          schema:
+            type: string
+          example: '0x5e9de2ca104975c0fe901b8bd37b98b50618544e9b7e242f2ab1ef0c323cc4bc'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Server:
+              schema:
+                type: string
+                example: nginx/1.24.0 (Ubuntu)
+            Date:
+              schema:
+                type: string
+                example: Fri, 30 May 2025 09:25:05 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Content-Length:
+              schema:
+                type: integer
+                example: '427'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            vary:
+              schema:
+                type: string
+                example: >-
+                  origin, access-control-request-method,
+                  access-control-request-headers
+            access-control-allow-origin:
+              schema:
+                type: string
+                example: '*'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                digest: >-
+                  0x9499e2c10432136d0d72d9be69cc9765a79760de44493e3b2cb17af840d1e9ea
+                status: ANCHORED
+                created_at: '2025-05-30'
+                registry_id: JCg3qcjYS6FXfcJeuFhi8eqStKf6ctiZm7TzYp2rdEf6b5uppu1L
+                registry_entry_id: JCfs8cRUggg66MGVKJG8pwe1Bx3ZhZU128S9eVGjvpayDVSw2FNA
+                block_hash: >-
+                  0x35c4129602d66194aa4a005c3a6d614427189d9b152586dd1287461585a9822b
+                user_id: ed7f1f09-3422-4b00-974c-1b04c867e33e
+                modified_at: '2025-05-30'
+  /update-digest:
+    post:
+      tags:
+        - Cord
+      summary: Update Hash/Digest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                old_digest: >-
+                  0x5e9de2ca104975c0fe901b8bd37b98b50618544e9b7e242f2ab1ef0c323cc4bc
+                new_digest: >-
+                  0x30512d0c82ca0a54bf1cf4395215463a94bbda068dc9def277abb6175951b3cc
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          headers:
+            Server:
+              schema:
+                type: string
+                example: nginx/1.24.0 (Ubuntu)
+            Date:
+              schema:
+                type: string
+                example: Fri, 30 May 2025 09:27:33 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Content-Length:
+              schema:
+                type: integer
+                example: '106'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            vary:
+              schema:
+                type: string
+                example: >-
+                  origin, access-control-request-method,
+                  access-control-request-headers
+            access-control-allow-origin:
+              schema:
+                type: string
+                example: '*'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: >-
+                  Digest received and update processing started for user
+                  ed7f1f09-3422-4b00-974c-1b04c867e33e.
+  /verify-digest:
+    post:
+      tags:
+        - Cord
+      summary: Verfiy Digest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                digest: >-
+                  0x30512d0c82ca0a54bf1cf4395215463a94bbda068dc9def277abb6175951b3cc
+                registry_id: 76EU7NQCaBWNZdzMBBnM6eKi8fscmy5STEfn3vwLDhstQ77QLn2Wn4
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          headers:
+            Server:
+              schema:
+                type: string
+                example: nginx/1.24.0 (Ubuntu)
+            Date:
+              schema:
+                type: string
+                example: Tue, 22 Jul 2025 18:12:10 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Content-Length:
+              schema:
+                type: integer
+                example: '20'
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            vary:
+              schema:
+                type: string
+                example: >-
+                  origin, access-control-request-method,
+                  access-control-request-headers
+            access-control-allow-origin:
+              schema:
+                type: string
+                example: '*'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                is_verified: true
